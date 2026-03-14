@@ -1,226 +1,271 @@
-# Padrões de Componentes UI
+# UI Components — Padrões de Criação
 
-## Visão Geral
+Guia de referência para manter consistência ao criar novos componentes na pasta `src/components/ui`.
 
-Este documento estabelece os padrões para criação de componentes de UI genéricos no projeto.
+## Regras gerais
 
-## Estrutura de Arquivos
+1. **Named exports apenas** — nunca use `export default`.
+2. **Exporte o componente, a função de variantes (`tv`), e os tipos** para permitir reuso e composição.
+3. **Estenda as props nativas do HTML** usando `ComponentProps<"elemento">` do React.
+4. **Não declare `className` manualmente no tipo** — ela já vem de `ComponentProps`.
+5. **Um arquivo por componente** — nomeie o arquivo em kebab-case (ex: `button.tsx`, `text-field.tsx`).
 
-```
-src/components/ui/
-```
+## Estilização
 
-## Criando um Componente
+### Tailwind Variants (`tv`)
 
-### 1. Estrutura Básica
+Use `tailwind-variants` para definir todas as variantes do componente:
 
 ```tsx
-import { type HTMLAttributes, forwardRef } from 'react';
-import { tv, type VariantProps } from 'tailwind-variants';
+import { tv, type VariantProps } from "tailwind-variants";
 
-const componentVariants = tv(
-  {
-    base: 'classes base do componente',
-    variants: {
-      variant: {
-        default: 'classes para variant default',
-        secondary: 'classes para variant secondary',
-      },
-      size: {
-        default: 'classes para tamanho default',
-        sm: 'classes para tamanho small',
-        lg: 'classes para tamanho large',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
+const component = tv({
+  base: [...],
+  variants: {
+    variant: { ... },
+    size: { ... },
   },
-  {
-    twMerge: false,
+  defaultVariants: {
+    variant: "primary",
+    size: "md",
   },
-);
-
-export interface ComponentProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof componentVariants> {}
-
-const Component = forwardRef<HTMLDivElement, ComponentProps>(
-  ({ className, variant, size, ...props }, ref) => {
-    return (
-      <div
-        className={componentVariants({ variant, size, className })}
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
-
-Component.displayName = 'Component';
-
-export { Component, componentVariants };
-```
-
-### 2. Regras Importantes
-
-#### Não usar twMerge com tailwind-variants
-
-O `tailwind-variants` já faz o merge automaticamente quando você passa `className` como propriedade. Usar `twMerge` junto pode causar conflitos.
-
-```tsx
-// ✅ Correto
-className={componentVariants({ variant, size, className })}
-
-// ❌ Errado
-import { twMerge } from 'tailwind-merge';
-className={twMerge(componentVariants({ variant, size }), className)}
-```
-
-#### Extender propriedades nativas
-
-Sempre extenda as propriedades nativas do elemento HTML:
-
-```tsx
-export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
-```
-
-#### Usar named exports
-
-Nunca use default exports:
-
-```tsx
-// ✅ Correto
-export { Button, buttonVariants };
-
-// ❌ Errado
-export default Button;
-```
-
-#### Usar forwardRef
-
-Sempre use `forwardRef` para permitir ref forwarding:
-
-```tsx
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
-    return <button ref={ref} {...props} />;
-  },
-);
-
-Button.displayName = 'Button';
-```
-
-#### Configurar twMerge: false
-
-Sempre adicione `{ twMerge: false }` como segundo argumento do `tv()`:
-
-```tsx
-const buttonVariants = tv(
-  { ... },
-  {
-    twMerge: false,
-  },
-);
-```
-
-### 3. CSS Variables no globals.css
-
-Adicione as CSS variables no `@layer base` do `src/app/globals.css`:
-
-```css
-@layer base {
-  :root {
-    --color-primary: #000000;
-    --color-secondary: #ffffff;
-  }
-}
-```
-
-### 4. Configuração de Fontes
-
-#### Fontes do Projeto
-
-- **font-sans**: Fonte do sistema (`system-ui, sans-serif`) - padrão do Tailwind
-- **font-mono**: JetBrains Mono (via `--font-mono`)
-
-#### No layout.tsx
-
-Configure apenas fontes monospaced no `src/app/layout.tsx`:
-
-```tsx
-import { JetBrains_Mono } from 'next/font/google';
-import './globals.css';
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: '--font-mono',
-  subsets: ['latin'],
 });
+```
 
-export default function RootLayout({ children }) {
+### Merge de classes
+
+**Componentes com `tv()`:** passe `className` como propriedade na chamada da função `tv`, que já faz merge internamente:
+
+```tsx
+function Component({ variant, size, className, ...props }: ComponentProps) {
   return (
-    <html lang="en">
-      <body className={`${jetbrainsMono.variable} antialiased`}>
-        {children}
-      </body>
-    </html>
+    <div className={component({ variant, size, className })} {...props} />
   );
 }
 ```
 
-#### No globals.css
+**Componentes sem `tv()`:** use `twMerge` para unir classes base com `className`:
 
-Defina as variáveis de fonte:
+```tsx
+import { twMerge } from "tailwind-merge";
 
-```css
-@layer base {
-  :root {
-    --font-sans: system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-  }
+function Component({ className, ...props }: ComponentProps) {
+  return (
+    <div className={twMerge("base-classes here", className)} {...props} />
+  );
 }
 ```
 
-#### Nos Componentes
-
-Use classes nativas do Tailwind para fontes:
+**NUNCA use interpolação de string** para unir `className`:
 
 ```tsx
-// ✅ Correto - usar classes nativas
-<span className="text-white">Texto</span>
-<span className="text-neutral-400">Texto secundário</span>
-<span className="font-mono">Código</span>
+// ERRADO
+className={`base-classes ${className ?? ""}`}
 
-// ❌ Errado - não usar variáveis customizadas
-<span className="text-[--text-primary]">Texto</span>
+// CERTO
+className={twMerge("base-classes", className)}
 ```
 
-### 5. Cores
+### Cores — Tailwind `@theme` variables
 
-Use classes nativas do Tailwind ou CSS variables do projeto quando necessário:
+Todas as cores customizadas do projeto são definidas no bloco `@theme` do `globals.css` usando o namespace `--color-*`.
+O Tailwind v4 gera automaticamente classes utilitárias nativas a partir dessas variáveis.
+
+**Exemplo de definição em `@theme`:**
+
+```css
+@theme {
+  --color-accent-green: #10b981;
+  --color-bg-page: #0a0a0a;
+  --color-text-primary: #fafafa;
+  --color-border-primary: #2a2a2a;
+}
+```
+
+**Uso nos componentes — classes canônicas:**
+
+```
+bg-accent-green          // fundo verde
+text-text-primary        // texto primário
+border-border-primary    // borda
+bg-bg-page               // fundo da página
+text-accent-red          // texto vermelho
+bg-diff-added            // fundo de linha adicionada
+```
+
+**NUNCA use** a sintaxe `bg-(--color-accent-green)` ou `bg-[var(--color-accent-green)]`.
+Use sempre a classe canônica gerada pelo Tailwind (ex: `bg-accent-green`).
+
+**Exceção:** atributos SVG como `stroke`, `fill`, `stopColor` não aceitam classes Tailwind.
+Nesses casos, use `var(--color-*)` diretamente:
 
 ```tsx
-// ✅ Correto - classes nativas do Tailwind
-<div className="bg-white text-black" />
-<div className="bg-neutral-900 text-neutral-400" />
-
-// ✅ Também válido - CSS variables para cores do design system
-<div className="bg-[--bg-page]" />
-<div className="text-[--accent-green]" />
+<circle stroke="var(--color-border-primary)" />
+<stop stopColor="var(--color-accent-green)" />
 ```
 
-### 6. Checklist de Criação de Componente
+### Cores nativas do Tailwind
 
-- [ ] Criar arquivo em `src/components/ui/[componente].tsx`
-- [ ] Usar `tv()` com `{ twMerge: false }`
-- [ ] Extender propriedades nativas do HTML
-- [ ] Usar named exports
-- [ ] Usar `forwardRef`
-- [ ] Adicionar `displayName`
-- [ ] Usar classes nativas do Tailwind (font-sans, font-mono, text-*, bg-*)
-- [ ] Usar CSS variables apenas quando necessário
-- [ ] Documentar variantes e tamanhos
-- [ ] Testar todas as variantes na página de componentes
+Quando a cor corresponde a uma utilidade nativa do Tailwind, **use a classe nativa** em vez de referenciar a variável customizada. Exemplos:
+
+```
+text-white           // em vez de text-[#ffffff]
+text-black           // em vez de text-[#000000]
+bg-transparent       // em vez de bg-[transparent]
+```
+
+### Prefixos das variáveis de cor
+
+- `--color-bg-*` — fundos (gera `bg-bg-*`)
+- `--color-text-*` — texto (gera `text-text-*`)
+- `--color-border-*` — bordas (gera `border-border-*`)
+- `--color-accent-*` — cores de destaque (gera `bg-accent-*`, `text-accent-*`)
+- `--color-diff-*` — fundos de diff (gera `bg-diff-*`)
+- `--color-primary` / `--color-destructive` — ações principais
+
+### Fontes
+
+As fontes são configuradas via `@theme` no `globals.css` usando variáveis do Tailwind:
+
+- `font-sans` — fonte padrão do sistema (sans-serif). Aplicada ao `<body>` por padrão.
+- `font-mono` — JetBrains Mono (monospace). Usar para texto de código, terminais, labels estilizados.
+
+**Nunca crie classes customizadas** como `font-primary` ou `font-secondary`.
+Use exclusivamente `font-sans` e `font-mono` do Tailwind.
+
+## Composição vs Props
+
+Use o **pattern de composição** (sub-componentes) quando o componente possui pedaços visuais distintos (título, descrição, ícone, etc.) que o consumidor pode querer reorganizar ou omitir.
+
+Use **props simples** quando o componente é um primitivo atômico (`Button`, `Badge`, `Toggle`) ou quando as props são dados de configuração/cálculo, não sub-elementos visuais (`ScoreRing`, `CodeBlock`).
+
+### Quando usar composição
+
+- O componente tem 2+ áreas de conteúdo semanticamente distintas (título, descrição, badge, etc.)
+- O consumidor pode querer trocar, omitir ou reorganizar sub-elementos
+- Ex: `AnalysisCard`, `LeaderboardRow`
+
+### Quando NÃO usar composição
+
+- Componentes atômicos com `children` simples (`Button`, `Badge`, `DiffLine`)
+- Componentes com props de configuração numérica/funcional (`ScoreRing`, `CodeBlock`)
+- Toggle/inputs com label como prop simples
+
+### Estrutura de composição
+
+Use **named exports individuais** com prefixo do componente (nunca dot notation):
+
+```tsx
+import type { ComponentProps } from "react";
+import { tv } from "tailwind-variants";
+
+const card = tv({
+  base: ["flex flex-col gap-3 p-5", "border border-border-primary"],
+});
+
+type CardRootProps = ComponentProps<"div">;
+
+function CardRoot({ className, ...props }: CardRootProps) {
+  return <div className={card({ className })} {...props} />;
+}
+
+type CardTitleProps = ComponentProps<"p">;
+
+function CardTitle({ className, ...props }: CardTitleProps) {
+  return (
+    <p
+      className={tv({ base: "font-mono text-[13px] text-text-primary" })({
+        className,
+      })}
+      {...props}
+    />
+  );
+}
+
+type CardDescriptionProps = ComponentProps<"p">;
+
+function CardDescription({ className, ...props }: CardDescriptionProps) {
+  return (
+    <p
+      className={tv({ base: "text-xs leading-relaxed text-text-secondary" })({
+        className,
+      })}
+      {...props}
+    />
+  );
+}
+
+export {
+  CardRoot,
+  CardTitle,
+  CardDescription,
+  card,
+  type CardRootProps,
+  type CardTitleProps,
+  type CardDescriptionProps,
+};
+```
+
+**Uso:**
+
+```tsx
+<CardRoot>
+  <Badge variant="critical">critical</Badge>
+  <CardTitle>using var instead of const/let</CardTitle>
+  <CardDescription>the var keyword is...</CardDescription>
+</CardRoot>
+```
+
+## Estrutura do componente (primitivo simples)
+
+```tsx
+import type { ComponentProps } from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+
+// 1. Definir variantes com tv()
+const myComponent = tv({
+  base: [...],
+  variants: { ... },
+  defaultVariants: { ... },
+});
+
+// 2. Extrair tipo das variantes
+type MyComponentVariants = VariantProps<typeof myComponent>;
+
+// 3. Combinar com props nativas do elemento HTML
+type MyComponentProps = ComponentProps<"div"> & MyComponentVariants;
+
+// 4. Implementar o componente
+function MyComponent({ variant, size, className, ...props }: MyComponentProps) {
+  return (
+    <div className={myComponent({ variant, size, className })} {...props} />
+  );
+}
+
+// 5. Named exports de tudo
+export {
+  MyComponent,
+  myComponent,
+  type MyComponentProps,
+  type MyComponentVariants,
+};
+```
+
+## Checklist para novos componentes
+
+- [ ] Arquivo em kebab-case dentro de `src/components/ui/`
+- [ ] Named exports (componente, função tv, tipos)
+- [ ] Props nativas estendidas via `ComponentProps<"elemento">`
+- [ ] Variantes definidas com `tailwind-variants`
+- [ ] `className` passado via `tv({ ..., className })` ou `twMerge()` (nunca interpolação de string)
+- [ ] Cores via classes canônicas do Tailwind (`bg-accent-green`, `text-text-primary`)
+- [ ] Classes nativas do Tailwind quando aplicável (`text-white`, `bg-transparent`)
+- [ ] Fontes via `font-sans` / `font-mono` (nunca classes customizadas)
+- [ ] Sem cores hex hardcoded (exceto atributos SVG com `var(--color-*)`)
+- [ ] Sem `export default`
+- [ ] Sem sintaxe `bg-(--color-*)` — usar classe canônica
+- [ ] Composição (sub-componentes) para componentes com 2+ áreas de conteúdo distintas
+- [ ] Props simples para primitivos atômicos e configuração numérica/funcional
+- [ ] Adicionar variante na página de exemplos (`/components`)
+
+E sempre leia esse arquivo para saber as tomar as decisões certas.
