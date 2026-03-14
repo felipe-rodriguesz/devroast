@@ -1,65 +1,142 @@
-import Image from "next/image";
+'use client';
+
+import Link from 'next/link';
+import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import CodeInput from '@/components/ui/code-input';
+import LeaderboardTable from '@/components/ui/leaderboard-table';
+import { Toggle } from '@/components/ui/toggle';
 
 export default function Home() {
+  const [roastMode, setRoastMode] = useState(false);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center px-10 pt-20">
+      <div className="flex w-full max-w-[960px] flex-col gap-8">
+        <div className="flex flex-col gap-3">
+          <h1 className="flex items-center gap-3 font-mono text-4xl font-bold text-neutral-50">
+            <span className="text-accent-green">$</span>
+            <span>paste your code. get roasted.</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="font-mono text-sm text-neutral-400">
+            {/* drop your code below and we&apos;ll rate it — brutally honest or */}
+            full roast mode
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <CodeInput.Root>
+          <CodeInput.Header />
+          <CodeInput.Body>
+            <CodeInput.LineNumbers count={16} />
+            <CodeInput.Textarea placeholder="// paste your code here..." />
+          </CodeInput.Body>
+        </CodeInput.Root>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Toggle pressed={roastMode} onPressedChange={setRoastMode}>
+              roast mode
+            </Toggle>
+            <span className="font-mono text-xs text-neutral-500">
+              {/* maximum sarcasm enabled */}
+            </span>
+          </div>
+          <Button>
+            <span className="text-neutral-950">$</span>
+            roast_my_code
+          </Button>
         </div>
-      </main>
-    </div>
+
+        <div className="flex items-center justify-center gap-6">
+          <span className="font-mono text-xs text-neutral-500">
+            2,847 codes roasted
+          </span>
+          <span className="text-neutral-500">·</span>
+          <span className="font-mono text-xs text-neutral-500">
+            avg score: 4.2/10
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center gap-2 font-mono text-sm font-bold text-neutral-50">
+              <span className="text-accent-green">{/*//*/}</span>
+              shame_leaderboard
+            </h2>
+            <span className="font-mono text-xs text-neutral-400 hover:text-neutral-50 cursor-pointer">
+              $ view_all &gt;&gt;
+            </span>
+          </div>
+          <p className="font-mono text-xs text-neutral-500">
+            {/* the worst code on the internet, ranked by shame */}
+          </p>
+          <LeaderboardTable.Root>
+            <LeaderboardTable.Header />
+            <LeaderboardTable.Body>
+              <LeaderboardTable.Row>
+                <LeaderboardTable.Cell className="text-neutral-500">
+                  #1
+                </LeaderboardTable.Cell>
+                <LeaderboardTable.Cell
+                  width={70}
+                  className="font-bold text-accent-red"
+                >
+                  1.2
+                </LeaderboardTable.Cell>
+                <LeaderboardTable.Cell className="flex-1 truncate text-neutral-400">
+                  {'function calculate() { var total = 0; ...'}
+                </LeaderboardTable.Cell>
+                <LeaderboardTable.Cell width={100} className="text-neutral-500">
+                  javascript
+                </LeaderboardTable.Cell>
+              </LeaderboardTable.Row>
+              <LeaderboardTable.Row>
+                <LeaderboardTable.Cell className="text-neutral-500">
+                  #2
+                </LeaderboardTable.Cell>
+                <LeaderboardTable.Cell
+                  width={70}
+                  className="font-bold text-accent-red"
+                >
+                  2.8
+                </LeaderboardTable.Cell>
+                <LeaderboardTable.Cell className="flex-1 truncate text-neutral-400">
+                  {'const process = (data) => { return data.forEach...'}
+                </LeaderboardTable.Cell>
+                <LeaderboardTable.Cell width={100} className="text-neutral-500">
+                  typescript
+                </LeaderboardTable.Cell>
+              </LeaderboardTable.Row>
+              <LeaderboardTable.Row>
+                <LeaderboardTable.Cell className="text-neutral-500">
+                  #3
+                </LeaderboardTable.Cell>
+                <LeaderboardTable.Cell
+                  width={70}
+                  className="font-bold text-accent-amber"
+                >
+                  3.1
+                </LeaderboardTable.Cell>
+                <LeaderboardTable.Cell className="flex-1 truncate text-neutral-400">
+                  {'if (condition) { doSomething() } else { ...'}
+                </LeaderboardTable.Cell>
+                <LeaderboardTable.Cell width={100} className="text-neutral-500">
+                  python
+                </LeaderboardTable.Cell>
+              </LeaderboardTable.Row>
+            </LeaderboardTable.Body>
+          </LeaderboardTable.Root>
+          <div className="flex justify-center px-4 py-2">
+            <Link
+              href="/leaderboard"
+              className="font-mono text-xs text-neutral-500 hover:text-neutral-400"
+            >
+              showing top 3 of 2,847 · view full leaderboard &gt;&gt;
+            </Link>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
