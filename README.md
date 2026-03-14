@@ -1,36 +1,36 @@
 # DevRoast
 
-Paste your code. Get roasted.
+Cole seu código. Receba um roast.
 
-Built during **NLW** by [Rocketseat](https://rocketseat.com.br).
+Construído durante o **NLW** pela [Rocketseat](https://rocketseat.com.br).
 
-## Features
+## Funcionalidades
 
-- **Code Analysis**: Paste your code and get a brutal roast about code quality
-- **Leaderboard**: See the worst code submissions ranked by shame
-- **Multiple Languages**: Support for JavaScript, TypeScript, Python, and more
-- **Syntax Highlighting**: Beautiful code display powered by Shiki
-- **Roast Mode**: Toggle between honest feedback and maximum sarcasm
+- **Análise de Código**: Cole seu código e receba um roast brutal sobre a qualidade
+- **Leaderboard**: Veja os piores códigos enviados ranqueados por vergonha
+- **Múltiplas Linguagens**: Suporte para JavaScript, TypeScript, Python e mais
+- **Syntax Highlighting**: Exibição de código bonita com Shiki
+- **Modo Roast**: Alterna entre feedback honesto e sarcasmo máximo
 
-## Tech Stack
+## Tecnologias
 
 - Next.js 16 (App Router)
 - React 19
 - Tailwind CSS v4
 - Shiki (syntax highlighting)
 
-## Getting Started
+## Começando
 
 ```bash
-# Install dependencies
+# Instalar dependências
 pnpm install
 
-# Run development server
+# Rodar servidor de desenvolvimento
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the app.
+Abra [http://localhost:3000](http://localhost:3000) para ver o app.
 
-## License
+## Licença
 
 MIT

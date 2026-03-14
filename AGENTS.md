@@ -15,18 +15,8 @@ const Component = {
   Root,
   Header,
   Body,
-  // ...
 };
 export default Component;
-```
-
-### Variants with tailwind-variants
-```tsx
-const variants = tv({
-  base: '...',
-  variants: { variant: { default: '...', secondary: '...' } },
-  defaultVariants: { variant: 'default' },
-}, { twMerge: false });
 ```
 
 ### Use twMerge for className merging
@@ -38,14 +28,6 @@ className={twMerge(variants({ variant, className }))}
 ### Use enabled: selector for disabled hover states
 ```tsx
 variant: { default: 'bg-green enabled:hover:bg-green/90' }
-```
-
-## File Structure
-```
-src/
-  app/           # Next.js App Router pages
-  components/
-    ui/          # Reusable UI components
 ```
 
 ## Commands
