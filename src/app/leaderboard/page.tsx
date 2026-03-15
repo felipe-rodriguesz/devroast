@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
+import { cacheLife } from 'next/cache';
 import type { BundledLanguage } from 'shiki';
 import { CodeBlock } from '@/components/ui/code-block';
+import { caller } from '@/trpc/server';
+import { LeaderboardEntryCode } from '../leaderboard-entry-code';
 
 export const metadata: Metadata = {
   title: 'Shame Leaderboard — DevRoast',
@@ -8,68 +11,21 @@ export const metadata: Metadata = {
     'The most roasted code on the internet. See the worst-scored submissions ranked by shame.',
 };
 
-type LeaderboardEntry = {
-  rank: number;
-  score: number;
-  language: string;
-  lang: BundledLanguage;
-  code: string;
-};
-
-const entries: LeaderboardEntry[] = [
-  {
-    rank: 1,
-    score: 1.2,
-    language: 'javascript',
-    lang: 'javascript',
-    code: `eval(prompt("enter code"))
-document.write(response)
-// trust the user lol`,
-  },
-  {
-    rank: 2,
-    score: 1.8,
-    language: 'typescript',
-    lang: 'typescript',
-    code: `if (x == true) { return true; }
-else if (x == false) { return false; }
-else { return !false; }`,
-  },
-  {
-    rank: 3,
-    score: 2.1,
-    language: 'sql',
-    lang: 'sql',
-    code: `SELECT * FROM users WHERE 1=1
--- TODO: add authentication`,
-  },
-  {
-    rank: 4,
-    score: 2.3,
-    language: 'java',
-    lang: 'java',
-    code: `catch (e) {
-  // ignore
-}`,
-  },
-  {
-    rank: 5,
-    score: 2.5,
-    language: 'javascript',
-    lang: 'javascript',
-    code: `const sleep = (ms) =>
-  new Date(Date.now() + ms)
-  while(new Date() < end) {}`,
-  },
-];
-
 function scoreColor(score: number): string {
   if (score <= 3) return 'text-accent-red';
   if (score <= 6) return 'text-accent-amber';
   return 'text-accent-green';
 }
 
-export default function LeaderboardPage() {
+export default async function LeaderboardPage() {
+  'use cache';
+  cacheLife({ stale: 3600 });
+
+  const [{ totalRoasts, avgScore }, { entries }] = await Promise.all([
+    caller.roast.getStats(),
+    caller.roast.getLeaderboard({ limit: 20 }),
+  ]);
+
   return (
     <main className="flex flex-col w-full">
       <div className="flex flex-col gap-10 w-full max-w-6xl mx-auto px-10 md:px-20 py-10">
@@ -90,68 +46,66 @@ export default function LeaderboardPage() {
 
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs text-text-tertiary">
-              2,847 submissions
+              {totalRoasts.toLocaleString()} submissions
             </span>
             <span className="font-mono text-xs text-text-tertiary">{'·'}</span>
             <span className="font-mono text-xs text-text-tertiary">
-              avg score: 4.2/10
+              avg score: {avgScore.toFixed(1)}/10
             </span>
           </div>
         </section>
 
         {/* Leaderboard Entries */}
         <section className="flex flex-col gap-5">
-          {entries.map((entry) => {
-            const lineCount = entry.code.split('\n').length;
-
-            return (
-              <article
-                key={entry.rank}
-                className="flex flex-col border border-border-primary overflow-hidden"
-              >
-                {/* Meta Row */}
-                <div className="flex items-center justify-between h-12 px-5 border-b border-border-primary">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-[13px] text-text-tertiary">
-                        #
-                      </span>
-                      <span className="font-mono text-[13px] font-bold text-accent-amber">
-                        {entry.rank}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-xs text-text-tertiary">
-                        score:
-                      </span>
-                      <span
-                        className={`font-mono text-[13px] font-bold ${scoreColor(entry.score)}`}
-                      >
-                        {entry.score.toFixed(1)}
-                      </span>
-                    </div>
+          {entries.map((entry) => (
+            <article
+              key={entry.id}
+              className="flex flex-col border border-border-primary overflow-hidden"
+            >
+              {/* Meta Row */}
+              <div className="flex items-center justify-between h-12 px-5 border-b border-border-primary">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-[13px] text-text-tertiary">
+                      #
+                    </span>
+                    <span className="font-mono text-[13px] font-bold text-accent-amber">
+                      {entry.rank}
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono text-xs text-text-secondary">
-                      {entry.language}
-                    </span>
+                  <div className="flex items-center gap-1.5">
                     <span className="font-mono text-xs text-text-tertiary">
-                      {lineCount} lines
+                      score:
+                    </span>
+                    <span
+                      className={`font-mono text-[13px] font-bold ${scoreColor(entry.score)}`}
+                    >
+                      {entry.score.toFixed(1)}
                     </span>
                   </div>
                 </div>
 
-                {/* Code Preview */}
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs text-text-secondary">
+                    {entry.language}
+                  </span>
+                  <span className="font-mono text-xs text-text-tertiary">
+                    {entry.lineCount} lines
+                  </span>
+                </div>
+              </div>
+
+              {/* Code Preview with Collapsible */}
+              <LeaderboardEntryCode lineCount={entry.lineCount}>
                 <CodeBlock
                   code={entry.code}
-                  lang={entry.lang}
+                  lang={entry.language as BundledLanguage}
                   className="border-0"
                 />
-              </article>
-            );
-          })}
+              </LeaderboardEntryCode>
+            </article>
+          ))}
         </section>
       </div>
     </main>

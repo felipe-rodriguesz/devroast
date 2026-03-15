@@ -1,25 +1,25 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 import {
   AnalysisCardDescription,
   AnalysisCardRoot,
   AnalysisCardTitle,
-} from "@/components/ui/analysis-card";
-import { Badge } from "@/components/ui/badge";
-import { CodeBlock } from "@/components/ui/code-block";
-import { DiffLine } from "@/components/ui/diff-line";
-import { ScoreRing } from "@/components/ui/score-ring";
+} from '@/components/ui/analysis-card';
+import { Badge } from '@/components/ui/badge';
+import { CodeBlock } from '@/components/ui/code-block';
+import { DiffLine } from '@/components/ui/diff-line';
+import { ScoreRing } from '@/components/ui/score-ring';
 
 export const metadata: Metadata = {
-  title: "Roast Result — DevRoast",
-  description: "See how your code scored on DevRoast — brutally honest.",
+  title: 'Roast Result — DevRoast',
+  description: 'See how your code scored on DevRoast — brutally honest.',
 };
 
 const roast = {
   score: 3.5,
-  verdict: "needs_serious_help" as const,
+  verdict: 'needs_serious_help' as const,
   quote:
     '"this code looks like it was written during a power outage... in 2005."',
-  language: "javascript",
+  language: 'javascript',
   lines: 7,
   code: `function calculateTotal(items) {
   var total = 0;
@@ -39,54 +39,54 @@ const roast = {
 }`,
   issues: [
     {
-      variant: "critical" as const,
-      label: "critical",
-      title: "using var instead of const/let",
+      variant: 'critical' as const,
+      label: 'critical',
+      title: 'using var instead of const/let',
       description:
-        "var is function-scoped and leads to hoisting bugs. use const by default, let when reassignment is needed.",
+        'var is function-scoped and leads to hoisting bugs. use const by default, let when reassignment is needed.',
     },
     {
-      variant: "warning" as const,
-      label: "warning",
-      title: "imperative loop pattern",
+      variant: 'warning' as const,
+      label: 'warning',
+      title: 'imperative loop pattern',
       description:
-        "for loops are verbose and error-prone. use .reduce() or .map() for cleaner, functional transformations.",
+        'for loops are verbose and error-prone. use .reduce() or .map() for cleaner, functional transformations.',
     },
     {
-      variant: "good" as const,
-      label: "good",
-      title: "clear naming conventions",
+      variant: 'good' as const,
+      label: 'good',
+      title: 'clear naming conventions',
       description:
-        "calculateTotal and items are descriptive, self-documenting names that communicate intent without comments.",
+        'calculateTotal and items are descriptive, self-documenting names that communicate intent without comments.',
     },
     {
-      variant: "good" as const,
-      label: "good",
-      title: "single responsibility",
+      variant: 'good' as const,
+      label: 'good',
+      title: 'single responsibility',
       description:
-        "the function does one thing well — calculates a total. no side effects, no mixed concerns, no hidden complexity.",
+        'the function does one thing well — calculates a total. no side effects, no mixed concerns, no hidden complexity.',
     },
   ],
   diff: {
-    header: "your_code.ts → improved_code.ts",
+    header: 'your_code.ts → improved_code.ts',
     lines: [
-      { type: "context" as const, content: "function calculateTotal(items) {" },
-      { type: "removed" as const, content: "  var total = 0;" },
+      { type: 'context' as const, content: 'function calculateTotal(items) {' },
+      { type: 'removed' as const, content: '  var total = 0;' },
       {
-        type: "removed" as const,
-        content: "  for (var i = 0; i < items.length; i++) {",
+        type: 'removed' as const,
+        content: '  for (var i = 0; i < items.length; i++) {',
       },
       {
-        type: "removed" as const,
-        content: "    total = total + items[i].price;",
+        type: 'removed' as const,
+        content: '    total = total + items[i].price;',
       },
-      { type: "removed" as const, content: "  }" },
-      { type: "removed" as const, content: "  return total;" },
+      { type: 'removed' as const, content: '  }' },
+      { type: 'removed' as const, content: '  return total;' },
       {
-        type: "added" as const,
-        content: "  return items.reduce((sum, item) => sum + item.price, 0);",
+        type: 'added' as const,
+        content: '  return items.reduce((sum, item) => sum + item.price, 0);',
       },
-      { type: "context" as const, content: "}" },
+      { type: 'context' as const, content: '}' },
     ],
   },
 };
@@ -115,7 +115,7 @@ export default function RoastResultPage({
                 lang: {roast.language}
               </span>
               <span className="font-mono text-xs text-text-tertiary">
-                {"·"}
+                {'·'}
               </span>
               <span className="font-mono text-xs text-text-tertiary">
                 {roast.lines} lines
@@ -140,7 +140,7 @@ export default function RoastResultPage({
         <section className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <span className="font-mono text-sm font-bold text-accent-green">
-              {"//"}
+              {'//'}
             </span>
             <h2 className="font-mono text-sm font-bold text-text-primary">
               your_submission
@@ -157,7 +157,7 @@ export default function RoastResultPage({
         <section className="flex flex-col gap-6">
           <div className="flex items-center gap-2">
             <span className="font-mono text-sm font-bold text-accent-green">
-              {"//"}
+              {'//'}
             </span>
             <h2 className="font-mono text-sm font-bold text-text-primary">
               detailed_analysis
@@ -184,7 +184,7 @@ export default function RoastResultPage({
         <section className="flex flex-col gap-6">
           <div className="flex items-center gap-2">
             <span className="font-mono text-sm font-bold text-accent-green">
-              {"//"}
+              {'//'}
             </span>
             <h2 className="font-mono text-sm font-bold text-text-primary">
               suggested_fix

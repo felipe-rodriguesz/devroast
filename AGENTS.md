@@ -40,6 +40,22 @@ src/
       analysis-card.tsx  # Composition: Root, Title, Description
       leaderboard-row.tsx # Composition: Root, Rank, Score, Code, Language
       score-ring.tsx     # SVG score ring
+  db/                   # Database layer
+    schema.ts           # Drizzle schema
+    index.ts            # DB client
+    seed.ts             # Seed script
+  trpc/                 # tRPC API layer
+    AGENTS.md           # tRPC patterns and conventions
+    init.ts             # Context, base procedure
+    client.tsx          # Client provider
+    server.tsx           # Server utilities
+    query-client.ts      # QueryClient factory
+    routers/             # Domain routers
+      _app.ts           # Root router
+      roast.ts          # Roast domain router
+  hooks/                # Custom React hooks
+  lib/                  # Utilities and config
+@specs/                 # Feature specifications (see @specs/AGENTS.md)
 ```
 
 ## Key Decisions

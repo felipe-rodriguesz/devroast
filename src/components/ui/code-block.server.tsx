@@ -21,7 +21,6 @@ export async function CodeBlock({ code, language, filename }: CodeBlockProps) {
       )}
       <div
         className="bg-neutral-900 overflow-x-auto p-4 text-sm font-mono"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki generates safe HTML
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>

@@ -118,7 +118,6 @@ function CodeEditor({
         >
           {Array.from({ length: lineCount }, (_, i) => (
             <span
-              // biome-ignore lint/suspicious/noArrayIndexKey: line numbers are index-based and never reorder
               key={i}
               className="font-mono text-xs leading-[1.625] text-text-tertiary"
             >
@@ -135,7 +134,6 @@ function CodeEditor({
               ref={highlightedRef}
               aria-hidden="true"
               className="absolute inset-0 py-4 px-4 font-mono text-xs leading-[1.625] overflow-hidden whitespace-pre pointer-events-none [tab-size:2] [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent [&_.line]:leading-[1.625]"
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki generates trusted HTML from code strings
               dangerouslySetInnerHTML={{
                 __html: highlightedHtml,
               }}

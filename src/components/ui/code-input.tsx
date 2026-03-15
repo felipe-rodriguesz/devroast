@@ -258,7 +258,6 @@ const CodeInputTextarea = forwardRef<
         >
           {highlightedHtml && isReady ? (
             <code
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: Shiki generates trusted HTML from code strings
               dangerouslySetInnerHTML={{ __html: highlightedHtml }}
               className="[&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent [&_.line]:leading-[1.65]"
             />
