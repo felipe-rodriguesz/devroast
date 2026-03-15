@@ -1,11 +1,17 @@
 import path from 'node:path';
 import { faker } from '@faker-js/faker';
 import dotenv from 'dotenv';
-import postgres from 'postgres';
+import pg from 'pg';
 
 dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
-const connectionString = process.env.DATABASE_URL ?? '';
+const { Pool } = pg;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL ?? '' });
+
+async function query<T>(text: string, values: unknown[] = []): Promise<T[]> {
+  const result = await pool.query(text, values);
+  return result.rows as T[];
+}
 
 const LANGUAGES = [
   'javascript',
@@ -18,6 +24,14 @@ const LANGUAGES = [
   'c',
   'ruby',
   'php',
+] as const;
+
+const VERDICTS = [
+  'needs_serious_help',
+  'rough_around_edges',
+  'decent_code',
+  'solid_work',
+  'exceptional',
 ] as const;
 
 const ROAST_TEMPLATES = {
@@ -93,7 +107,7 @@ const ROAST_TEMPLATES = {
   ],
 };
 
-const HONEST_TEMPLATES = [
+const _HONEST_TEMPLATES = [
   'The code has some issues with naming conventions that could be improved for readability.',
   'Consider extracting this logic into smaller, more focused functions.',
   'The error handling could be more robust in this section.',
@@ -107,18 +121,22 @@ const HONEST_TEMPLATES = [
 ];
 
 type Language = (typeof LANGUAGES)[number];
-type RoastMode = 'honest' | 'roast';
+type Verdict = (typeof VERDICTS)[number];
 
 function getRandomElement<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function generateScore(): number {
-  return (
-    Math.round(
-      (Math.random() * 10 + faker.number.float({ min: 0, max: 2 })) * 10,
-    ) / 10
-  );
+  return Math.round(Math.random() * 10 * 10) / 10;
+}
+
+function getVerdictFromScore(score: number): Verdict {
+  if (score <= 2) return 'needs_serious_help';
+  if (score <= 4) return 'rough_around_edges';
+  if (score <= 6) return 'decent_code';
+  if (score <= 8) return 'solid_work';
+  return 'exceptional';
 }
 
 function generateCode(language: Language): string {
@@ -198,71 +216,89 @@ function generateCode(language: Language): string {
   return getRandomElement(codeSnippets[language]);
 }
 
-function generateRoastContent(language: Language, mode: RoastMode): string {
-  if (mode === 'honest') {
-    return getRandomElement(HONEST_TEMPLATES);
-  }
-
+function generateRoastQuote(
+  language: Language,
+  roastMode: boolean,
+): string | null {
+  if (!roastMode) return null;
   const templates = ROAST_TEMPLATES[language];
   return getRandomElement(templates);
+}
+
+function generateAnalysisItems(_language: Language, _roastMode: boolean) {
+  const severities = ['critical', 'warning', 'good'] as const;
+  const items: Array<{ severity: string; title: string; description: string }> =
+    [];
+
+  const count = faker.number.int({ min: 2, max: 5 });
+
+  for (let i = 0; i < count; i++) {
+    items.push({
+      severity: getRandomElement(severities),
+      title: faker.lorem.sentence({ min: 3, max: 6 }),
+      description: faker.lorem.paragraph(),
+    });
+  }
+
+  return items;
 }
 
 async function seed() {
   console.log('🌱 Starting seed...');
 
-  const client = postgres(connectionString);
-
   try {
-    await client`SELECT 1`;
+    await query('SELECT 1');
     console.log('✅ Connected to database');
 
-    const submissions: Array<{
-      id: string;
-      code: string;
-      language: Language;
-      roastMode: RoastMode;
-      score: number;
-    }> = [];
-
-    console.log('📝 Generating submissions...');
+    console.log('📝 Generating roasts...');
 
     for (let i = 0; i < 100; i++) {
       const language = getRandomElement(LANGUAGES);
-      const roastMode: RoastMode = Math.random() > 0.3 ? 'roast' : 'honest';
+      const roastMode = Math.random() > 0.3;
       const score = generateScore();
+      const verdict = getVerdictFromScore(score);
+      const lineCount = faker.number.int({ min: 1, max: 50 });
+      const code = generateCode(language);
+      const roastQuote = generateRoastQuote(language, roastMode);
+      const analysisItems = generateAnalysisItems(language, roastMode);
 
-      const result = await client`
-        INSERT INTO submissions (code, language, roast_mode, score)
-        VALUES (${generateCode(language)}, ${language}, ${roastMode}, ${score})
-        RETURNING id
-      `;
+      const result = await query<{ id: string }>(
+        `INSERT INTO roasts (code, language, line_count, roast_mode, score, verdict, roast_quote, suggested_fix) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+        [
+          code,
+          language,
+          lineCount,
+          roastMode,
+          score,
+          verdict,
+          roastQuote,
+          null,
+        ],
+      );
 
-      submissions.push({
-        id: result[0].id,
-        language,
-        roastMode,
-        code: generateCode(language),
-        score,
-      });
+      const roastId = result[0].id;
 
-      const analysisContent = generateRoastContent(language, roastMode);
-
-      await client`
-        INSERT INTO analyses ("submissionId", content, roast_mode)
-        VALUES (${result[0].id}, ${analysisContent}, ${roastMode})
-      `;
+      for (let j = 0; j < analysisItems.length; j++) {
+        const item = analysisItems[j];
+        await query(
+          `INSERT INTO analysis_items (roast_id, severity, title, description, "order") 
+           VALUES ($1, $2, $3, $4, $5)`,
+          [roastId, item.severity, item.title, item.description, j],
+        );
+      }
     }
 
-    console.log(`✅ Inserted 100 submissions with analyses`);
+    console.log(`✅ Inserted 100 roasts with analysis items`);
 
-    const stats = await client`
-      SELECT 
-        COUNT(*)::int as total,
-        AVG(score) as avg_score,
-        MIN(score) as min_score,
-        MAX(score) as max_score
-      FROM submissions
-    `;
+    const stats = await query<{
+      total: number;
+      avg_score: number;
+      min_score: number;
+      max_score: number;
+    }>(
+      'SELECT COUNT(*) as total, AVG(score) as avg_score, MIN(score) as min_score, MAX(score) as max_score FROM roasts',
+    );
 
     console.log('📊 Database stats:', stats[0]);
 
@@ -271,7 +307,7 @@ async function seed() {
     console.error('❌ Seed failed:', error);
     process.exit(1);
   } finally {
-    await client.end();
+    await pool.end();
   }
 }
 

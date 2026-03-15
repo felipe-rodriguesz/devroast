@@ -1,15 +1,11 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import * as schema from './schema';
+import { drizzle } from 'drizzle-orm/node-postgres';
 
-const connectionString = process.env.DATABASE_URL ?? '';
+const databaseUrl = process.env.DATABASE_URL;
 
-const client = postgres(connectionString);
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is not set');
+}
 
-export const db = drizzle(client, { schema });
-
-export type Database = typeof db;
-export type Submission = typeof schema.submissions.$inferSelect;
-export type NewSubmission = typeof schema.submissions.$inferInsert;
-export type Analysis = typeof schema.analyses.$inferSelect;
-export type NewAnalysis = typeof schema.analyses.$inferInsert;
+export const db = drizzle(databaseUrl, {
+  casing: 'snake_case',
+});

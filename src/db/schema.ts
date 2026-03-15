@@ -1,50 +1,50 @@
 import {
+  boolean,
+  index,
+  integer,
   pgEnum,
   pgTable,
   real,
   text,
   timestamp,
   uuid,
+  varchar,
 } from 'drizzle-orm/pg-core';
 
-export const languageEnum = pgEnum('language', [
-  'javascript',
-  'typescript',
-  'python',
-  'rust',
-  'go',
-  'java',
-  'cpp',
-  'c',
-  'ruby',
-  'php',
-  'sql',
-  'html',
-  'css',
-  'json',
-  'yaml',
-  'bash',
-  'shell',
-  'unknown',
+export const verdictEnum = pgEnum('verdict', [
+  'needs_serious_help',
+  'rough_around_edges',
+  'decent_code',
+  'solid_work',
+  'exceptional',
 ]);
 
-export const roastModeEnum = pgEnum('roast_mode', ['honest', 'roast']);
+export const severityEnum = pgEnum('severity', ['critical', 'warning', 'good']);
 
-export const submissions = pgTable('submissions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  code: text('code').notNull(),
-  language: languageEnum('language').notNull().default('unknown'),
-  roastMode: roastModeEnum('roast_mode').notNull().default('roast'),
-  score: real('score').notNull(),
-  createdAt: timestamp('createdAt').notNull().defaultNow(),
-});
+export const roasts = pgTable(
+  'roasts',
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    code: text().notNull(),
+    language: varchar({ length: 50 }).notNull(),
+    lineCount: integer().notNull(),
+    roastMode: boolean().default(false).notNull(),
+    score: real().notNull(),
+    verdict: verdictEnum().notNull(),
+    roastQuote: text(),
+    suggestedFix: text(),
+    createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index('roasts_score_idx').on(table.score)],
+);
 
-export const analyses = pgTable('analyses', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  submissionId: uuid('submissionId')
-    .notNull()
-    .references(() => submissions.id, { onDelete: 'cascade' }),
-  content: text('content').notNull(),
-  roastMode: roastModeEnum('roast_mode').notNull(),
-  createdAt: timestamp('createdAt').notNull().defaultNow(),
+export const analysisItems = pgTable('analysis_items', {
+  id: uuid().defaultRandom().primaryKey(),
+  roastId: uuid()
+    .references(() => roasts.id, { onDelete: 'cascade' })
+    .notNull(),
+  severity: severityEnum().notNull(),
+  title: varchar({ length: 200 }).notNull(),
+  description: text().notNull(),
+  order: integer().notNull(),
 });

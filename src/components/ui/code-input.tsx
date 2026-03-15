@@ -1,59 +1,55 @@
 'use client';
 
-import hljs from 'highlight.js';
 import { ChevronDown } from 'lucide-react';
 import {
+  createContext,
   forwardRef,
   type HTMLAttributes,
   type TextareaHTMLAttributes,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import type { BundledLanguage } from 'shiki';
-import { codeToHtml } from 'shiki';
 import { twMerge } from 'tailwind-merge';
+import { useLanguageDetection } from '@/hooks/use-language-detection';
+import { useShikiHighlighter } from '@/hooks/use-shiki-highlighter';
+import { LANGUAGE_OPTIONS, LANGUAGES } from '@/lib/languages';
 
-const SUPPORTED_LANGUAGES = [
-  { id: 'auto', name: 'Auto' },
-  { id: 'javascript', name: 'JavaScript' },
-  { id: 'typescript', name: 'TypeScript' },
-  { id: 'python', name: 'Python' },
-  { id: 'java', name: 'Java' },
-  { id: 'c', name: 'C' },
-  { id: 'cpp', name: 'C++' },
-  { id: 'go', name: 'Go' },
-  { id: 'rust', name: 'Rust' },
-  { id: 'php', name: 'PHP' },
-  { id: 'ruby', name: 'Ruby' },
-  { id: 'bash', name: 'Bash' },
-  { id: 'json', name: 'JSON' },
-  { id: 'yaml', name: 'YAML' },
-  { id: 'markdown', name: 'Markdown' },
-] as const;
+const CodeInputContext = createContext<{
+  onDetectedLanguageChange?: (language: string) => void;
+}>({});
 
-type LanguageId = (typeof SUPPORTED_LANGUAGES)[number]['id'];
+type LanguageId = keyof typeof LANGUAGES;
 
 interface CodeInputRootProps extends HTMLAttributes<HTMLDivElement> {
   language?: LanguageId;
   onLanguageChange?: (language: LanguageId) => void;
+  onDetectedLanguageChange?: (language: string) => void;
 }
 
 const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
   (
-    { className, children, language = 'auto', onLanguageChange, ...props },
+    {
+      className,
+      children,
+      language = 'auto',
+      onLanguageChange,
+      onDetectedLanguageChange,
+      ...props
+    },
     ref,
   ) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const currentLanguage = useMemo(() => {
-      return (
-        SUPPORTED_LANGUAGES.find((l) => l.id === language) ||
-        SUPPORTED_LANGUAGES[0]
-      );
+      if (language === 'auto') {
+        return { name: 'Auto', shikiId: 'javascript', hljsId: 'javascript' };
+      }
+      return LANGUAGES[language] || LANGUAGES.javascript;
     }, [language]);
 
     useEffect(() => {
@@ -74,7 +70,7 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
       <div
         ref={ref}
         className={twMerge(
-          'flex h-[360px] w-full flex-col overflow-hidden rounded-md border border-border-primary bg-bg-input',
+          'flex max-h-[360px] w-full flex-col overflow-hidden rounded-md border border-border-primary bg-bg-input',
           className,
         )}
         {...props}
@@ -103,22 +99,37 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
 
             {isOpen && (
               <div className="absolute right-0 top-full z-50 mt-1 max-h-60 w-40 overflow-auto rounded-md border border-border-primary bg-bg-elevated shadow-lg">
-                {SUPPORTED_LANGUAGES.map((lang) => (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onLanguageChange?.('auto');
+                    setIsOpen(false);
+                  }}
+                  className={twMerge(
+                    'w-full px-3 py-2 text-left font-mono text-xs hover:bg-bg-surface',
+                    language === 'auto'
+                      ? 'bg-bg-surface text-text-primary'
+                      : 'text-text-secondary',
+                  )}
+                >
+                  Auto
+                </button>
+                {LANGUAGE_OPTIONS.map((lang) => (
                   <button
-                    key={lang.id}
+                    key={lang.value}
                     type="button"
                     onClick={() => {
-                      onLanguageChange?.(lang.id);
+                      onLanguageChange?.(lang.value as LanguageId);
                       setIsOpen(false);
                     }}
                     className={twMerge(
                       'w-full px-3 py-2 text-left font-mono text-xs hover:bg-bg-surface',
-                      lang.id === language
+                      lang.value === language
                         ? 'bg-bg-surface text-text-primary'
                         : 'text-text-secondary',
                     )}
                   >
-                    {lang.name}
+                    {lang.label}
                   </button>
                 ))}
               </div>
@@ -127,7 +138,9 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
         </div>
 
         {/* Body */}
-        {children}
+        <CodeInputContext.Provider value={{ onDetectedLanguageChange }}>
+          {children}
+        </CodeInputContext.Provider>
       </div>
     );
   },
@@ -186,8 +199,8 @@ interface CodeInputTextareaProps
   extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
   value: string;
   onChange: (value: string) => void;
-  highlightedHtml?: string;
   onHighlightedHtmlChange?: (html: string) => void;
+  onDetectedLanguageChange?: (language: string) => void;
 }
 
 const CodeInputTextarea = forwardRef<
@@ -199,49 +212,31 @@ const CodeInputTextarea = forwardRef<
       className,
       value,
       onChange,
-      highlightedHtml,
-      onHighlightedHtmlChange,
+      onHighlightedHtmlChange: _onHighlightedHtmlChange,
+      onDetectedLanguageChange,
       ...props
     },
     ref,
   ) => {
     const preRef = useRef<HTMLPreElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const [isHighlighting, setIsHighlighting] = useState(false);
+    const context = useContext(CodeInputContext);
+    const handleDetectedLanguageChange =
+      onDetectedLanguageChange ?? context.onDetectedLanguageChange;
+
+    const { detectedLanguage, confidence } = useLanguageDetection(value);
+    const { highlight, isReady } = useShikiHighlighter();
 
     useEffect(() => {
-      const updateHighlight = async () => {
-        if (!value.trim()) {
-          onHighlightedHtmlChange?.('');
-          setIsHighlighting(false);
-          return;
-        }
+      if (detectedLanguage && confidence >= 3) {
+        handleDetectedLanguageChange?.(detectedLanguage);
+      }
+    }, [detectedLanguage, confidence, handleDetectedLanguageChange]);
 
-        setIsHighlighting(true);
-
-        try {
-          const result = hljs.highlightAuto(value);
-          const lang = result.language || 'plaintext';
-
-          const html = await codeToHtml(value, {
-            lang: lang as BundledLanguage,
-            theme: 'vesper',
-          });
-
-          onHighlightedHtmlChange?.(html);
-        } catch {
-          const escaped = value
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-          onHighlightedHtmlChange?.(`<pre><code>${escaped}</code></pre>`);
-        } finally {
-          setIsHighlighting(false);
-        }
-      };
-
-      updateHighlight();
-    }, [value, onHighlightedHtmlChange]);
+    const highlightedHtml = useMemo(() => {
+      if (!value.trim() || !isReady) return '';
+      return highlight(value, detectedLanguage || 'javascript');
+    }, [value, isReady, highlight, detectedLanguage]);
 
     const handleScroll = useCallback(() => {
       if (preRef.current && textareaRef.current) {
@@ -261,7 +256,7 @@ const CodeInputTextarea = forwardRef<
           )}
           aria-hidden="true"
         >
-          {highlightedHtml && !isHighlighting ? (
+          {highlightedHtml && isReady ? (
             <code
               // biome-ignore lint/security/noDangerouslySetInnerHtml: Shiki generates trusted HTML from code strings
               dangerouslySetInnerHTML={{ __html: highlightedHtml }}

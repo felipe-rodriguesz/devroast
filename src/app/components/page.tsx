@@ -5,7 +5,7 @@ import {
 } from '@/components/ui/analysis-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CodeBlock } from '@/components/ui/code-block';
+import { CodeBlock, CodeBlockHeader } from '@/components/ui/code-block';
 import { DiffLine } from '@/components/ui/diff-line';
 import {
   LeaderboardRowCode,
@@ -28,17 +28,18 @@ const sampleCode = `function calculateTotal(items) {
   }
 }`;
 
-export default async function ComponentsPage() {
+export default function ComponentsPage() {
   return (
-    <div className="min-h-screen bg-neutral-950 p-12 space-y-16">
+    <div className="min-h-screen bg-bg-page p-12 space-y-16">
       <header>
         <h1 className="font-mono text-accent-green text-lg mb-2">
           {'// component_library'}
         </h1>
-        <p className="text-neutral-400 text-sm">
+        <p className="text-text-secondary text-sm">
           Biblioteca de componentes UI do DevRoast
         </p>
       </header>
+
       {/* Button */}
       <Section title="button" file="button.tsx">
         <Subsection title="Variantes">
@@ -71,10 +72,13 @@ export default async function ComponentsPage() {
           </div>
         </Subsection>
       </Section>
+
       {/* Toggle */}
       <Section title="toggle" file="toggle.tsx">
         <ToggleDemo />
       </Section>
+
+      {/* Badge */}
       <Section title="badge_status" file="badge.tsx">
         <div className="flex items-center gap-6 flex-wrap">
           {badgeVariants.map((variant) => (
@@ -85,7 +89,8 @@ export default async function ComponentsPage() {
           <Badge variant="critical">needs_serious_help</Badge>
         </div>
       </Section>
-      ;
+
+      {/* Analysis Card */}
       <Section title="cards" file="analysis-card.tsx">
         <div className="flex flex-col gap-4 max-w-lg">
           <AnalysisCardRoot>
@@ -121,17 +126,22 @@ export default async function ComponentsPage() {
           </AnalysisCardRoot>
         </div>
       </Section>
+
       {/* Code Block */}
       <Section title="code_block" file="code-block.tsx">
         <div className="max-w-xl">
-          <CodeBlock
-            code={sampleCode}
-            lang="javascript"
-            filename="calculate.js"
-          />
+          <div className="border border-border-primary overflow-hidden">
+            <CodeBlockHeader filename="calculate.js" />
+            <CodeBlock
+              code={sampleCode}
+              lang="javascript"
+              className="border-0"
+            />
+          </div>
         </div>
       </Section>
-      ;
+
+      {/* Diff Line */}
       <Section title="diff_line" file="diff-line.tsx">
         <div className="max-w-xl">
           <DiffLine type="removed">var total = 0;</DiffLine>
@@ -141,9 +151,10 @@ export default async function ComponentsPage() {
           </DiffLine>
         </div>
       </Section>
-      ;
+
+      {/* Leaderboard Row */}
       <Section title="table_row" file="leaderboard-row.tsx">
-        <div className="max-w-2xl border border-neutral-800">
+        <div className="max-w-2xl">
           <LeaderboardRowRoot>
             <LeaderboardRowRank>#1</LeaderboardRowRank>
             <LeaderboardRowScore value={2.1} />
@@ -170,7 +181,8 @@ export default async function ComponentsPage() {
           </LeaderboardRowRoot>
         </div>
       </Section>
-      ;
+
+      {/* Score Ring */}
       <Section title="score_ring" file="score-ring.tsx">
         <div className="flex items-center gap-12 flex-wrap">
           <ScoreRing score={3.5} />
@@ -178,7 +190,6 @@ export default async function ComponentsPage() {
           <ScoreRing score={1.0} />
         </div>
       </Section>
-      ;
     </div>
   );
 }
@@ -195,10 +206,10 @@ function Section({
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="font-mono text-neutral-50 text-base mb-1">
+        <h2 className="font-mono text-text-primary text-base mb-1">
           {`$ ${title}`}
         </h2>
-        <p className="text-neutral-500 text-xs">src/components/ui/{file}</p>
+        <p className="text-text-tertiary text-xs">src/components/ui/{file}</p>
       </div>
       {children}
     </section>
@@ -214,7 +225,7 @@ function Subsection({
 }) {
   return (
     <div>
-      <h3 className="text-neutral-400 text-xs uppercase tracking-widest mb-4">
+      <h3 className="text-text-secondary text-xs uppercase tracking-widest mb-4">
         {title}
       </h3>
       {children}
