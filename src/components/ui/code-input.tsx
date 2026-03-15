@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown } from "lucide-react";
 import {
   createContext,
   forwardRef,
@@ -12,11 +12,11 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useLanguageDetection } from '@/hooks/use-language-detection';
-import { useShikiHighlighter } from '@/hooks/use-shiki-highlighter';
-import { LANGUAGE_OPTIONS, LANGUAGES } from '@/lib/languages';
+} from "react";
+import { twMerge } from "tailwind-merge";
+import { useLanguageDetection } from "@/hooks/use-language-detection";
+import { useShikiHighlighter } from "@/hooks/use-shiki-highlighter";
+import { LANGUAGE_OPTIONS, LANGUAGES } from "@/lib/languages";
 
 const CodeInputContext = createContext<{
   onDetectedLanguageChange?: (language: string) => void;
@@ -35,7 +35,7 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
     {
       className,
       children,
-      language = 'auto',
+      language = "auto",
       onLanguageChange,
       onDetectedLanguageChange,
       ...props
@@ -46,8 +46,8 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const currentLanguage = useMemo(() => {
-      if (language === 'auto') {
-        return { name: 'Auto', shikiId: 'javascript', hljsId: 'javascript' };
+      if (language === "auto") {
+        return { name: "Auto", shikiId: "javascript", hljsId: "javascript" };
       }
       return LANGUAGES[language] || LANGUAGES.javascript;
     }, [language]);
@@ -61,16 +61,16 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
           setIsOpen(false);
         }
       };
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
       return () =>
-        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     return (
       <div
         ref={ref}
         className={twMerge(
-          'flex max-h-[360px] w-full flex-col overflow-hidden rounded-md border border-border-primary bg-bg-input',
+          "flex max-h-[360px] w-full flex-col overflow-hidden rounded-md border border-border-primary bg-bg-input",
           className,
         )}
         {...props}
@@ -93,7 +93,7 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
               <span>{currentLanguage.name}</span>
               <ChevronDown
                 aria-label="Toggle language dropdown"
-                className={`size-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                className={`size-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
               />
             </button>
 
@@ -102,14 +102,14 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
                 <button
                   type="button"
                   onClick={() => {
-                    onLanguageChange?.('auto');
+                    onLanguageChange?.("auto");
                     setIsOpen(false);
                   }}
                   className={twMerge(
-                    'w-full px-3 py-2 text-left font-mono text-xs hover:bg-bg-surface',
-                    language === 'auto'
-                      ? 'bg-bg-surface text-text-primary'
-                      : 'text-text-secondary',
+                    "w-full px-3 py-2 text-left font-mono text-xs hover:bg-bg-surface",
+                    language === "auto"
+                      ? "bg-bg-surface text-text-primary"
+                      : "text-text-secondary",
                   )}
                 >
                   Auto
@@ -123,10 +123,10 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
                       setIsOpen(false);
                     }}
                     className={twMerge(
-                      'w-full px-3 py-2 text-left font-mono text-xs hover:bg-bg-surface',
+                      "w-full px-3 py-2 text-left font-mono text-xs hover:bg-bg-surface",
                       lang.value === language
-                        ? 'bg-bg-surface text-text-primary'
-                        : 'text-text-secondary',
+                        ? "bg-bg-surface text-text-primary"
+                        : "text-text-secondary",
                     )}
                   >
                     {lang.label}
@@ -145,7 +145,7 @@ const CodeInputRoot = forwardRef<HTMLDivElement, CodeInputRootProps>(
     );
   },
 );
-CodeInputRoot.displayName = 'CodeInputRoot';
+CodeInputRoot.displayName = "CodeInputRoot";
 
 const CodeInputBody = forwardRef<
   HTMLDivElement,
@@ -154,14 +154,14 @@ const CodeInputBody = forwardRef<
   return (
     <div
       ref={ref}
-      className={twMerge('flex flex-1 overflow-hidden', className)}
+      className={twMerge("flex flex-1 overflow-hidden", className)}
       {...props}
     >
       {children}
     </div>
   );
 });
-CodeInputBody.displayName = 'CodeInputBody';
+CodeInputBody.displayName = "CodeInputBody";
 
 interface CodeInputLineNumbersProps extends HTMLAttributes<HTMLDivElement> {
   count?: number;
@@ -177,7 +177,7 @@ const CodeInputLineNumbers = forwardRef<
     <div
       ref={ref}
       className={twMerge(
-        'flex flex-col items-end gap-1.5 border-r border-border-primary bg-bg-surface px-3 py-3 select-none min-w-10',
+        "flex flex-col items-end gap-1.5 border-r border-border-primary bg-bg-surface px-3 py-3 select-none min-w-10",
         className,
       )}
       {...props}
@@ -193,10 +193,10 @@ const CodeInputLineNumbers = forwardRef<
     </div>
   );
 });
-CodeInputLineNumbers.displayName = 'CodeInputLineNumbers';
+CodeInputLineNumbers.displayName = "CodeInputLineNumbers";
 
 interface CodeInputTextareaProps
-  extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
+  extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange"> {
   value: string;
   onChange: (value: string) => void;
   onHighlightedHtmlChange?: (html: string) => void;
@@ -234,8 +234,8 @@ const CodeInputTextarea = forwardRef<
     }, [detectedLanguage, confidence, handleDetectedLanguageChange]);
 
     const highlightedHtml = useMemo(() => {
-      if (!value.trim() || !isReady) return '';
-      return highlight(value, detectedLanguage || 'javascript');
+      if (!value.trim() || !isReady) return "";
+      return highlight(value, detectedLanguage || "javascript");
     }, [value, isReady, highlight, detectedLanguage]);
 
     const handleScroll = useCallback(() => {
@@ -251,7 +251,7 @@ const CodeInputTextarea = forwardRef<
         <pre
           ref={preRef}
           className={twMerge(
-            'absolute inset-0 overflow-auto p-3 font-mono text-[13px] leading-tight pointer-events-none',
+            "absolute inset-0 overflow-auto p-3 font-mono text-[13px] leading-tight pointer-events-none",
             className,
           )}
           aria-hidden="true"
@@ -263,7 +263,7 @@ const CodeInputTextarea = forwardRef<
             />
           ) : (
             <code className="text-text-tertiary whitespace-pre-wrap">
-              {value || ' '}
+              {value || " "}
             </code>
           )}
         </pre>
@@ -272,20 +272,20 @@ const CodeInputTextarea = forwardRef<
         <textarea
           ref={(node) => {
             if (node) textareaRef.current = node;
-            if (typeof ref === 'function') ref(node);
+            if (typeof ref === "function") ref(node);
             else if (ref) ref.current = node;
           }}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onScroll={handleScroll}
           className={twMerge(
-            'absolute inset-0 h-full w-full resize-none bg-transparent p-3 font-mono text-[13px] leading-tight text-transparent caret-text-primary outline-none placeholder:text-text-tertiary',
+            "absolute inset-0 h-full w-full resize-none bg-transparent p-3 font-mono text-[13px] leading-tight text-transparent caret-text-primary outline-none placeholder:text-text-tertiary",
             className,
           )}
           spellCheck={false}
           style={{
-            fontFamily: 'inherit',
-            lineHeight: '1.3rem',
+            fontFamily: "inherit",
+            lineHeight: "1.3rem",
           }}
           {...props}
         />
@@ -293,7 +293,7 @@ const CodeInputTextarea = forwardRef<
     );
   },
 );
-CodeInputTextarea.displayName = 'CodeInputTextarea';
+CodeInputTextarea.displayName = "CodeInputTextarea";
 
 const CodeInput = {
   Root: CodeInputRoot,

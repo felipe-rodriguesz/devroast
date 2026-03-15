@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type { HighlighterCore } from 'shiki/core';
-import { LANGUAGES } from '@/lib/languages';
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { HighlighterCore } from "shiki/core";
+import { LANGUAGES } from "@/lib/languages";
 
 let highlighterPromise: Promise<HighlighterCore> | null = null;
 let highlighterInstance: HighlighterCore | null = null;
@@ -22,16 +22,16 @@ async function getHighlighter(): Promise<HighlighterCore> {
 async function initHighlighter(): Promise<HighlighterCore> {
   const [{ createHighlighterCore }, { createJavaScriptRegexEngine }] =
     await Promise.all([
-      import('shiki/core'),
-      import('shiki/engine/javascript'),
+      import("shiki/core"),
+      import("shiki/engine/javascript"),
     ]);
 
   const eagerLangs = Object.values(LANGUAGES)
     .filter((l) => l.eager)
     .map((l) => l.shikiId);
 
-  const { bundledLanguages } = await import('shiki/langs');
-  const { bundledThemes } = await import('shiki/themes');
+  const { bundledLanguages } = await import("shiki/langs");
+  const { bundledThemes } = await import("shiki/themes");
 
   const langImports = eagerLangs
     .filter((id) => id in bundledLanguages)
@@ -53,8 +53,10 @@ async function initHighlighter(): Promise<HighlighterCore> {
   return instance;
 }
 
+/** Set of shiki language IDs that have been loaded */
 const loadedLanguages = new Set<string>();
 
+/** Pending language loads to avoid duplicate requests */
 const pendingLoads = new Map<string, Promise<void>>();
 
 async function ensureLanguageLoaded(
@@ -76,7 +78,7 @@ async function ensureLanguageLoaded(
   }
 
   const loadPromise = (async () => {
-    const { bundledLanguages } = await import('shiki/langs');
+    const { bundledLanguages } = await import("shiki/langs");
     const loader = bundledLanguages[shikiId as keyof typeof bundledLanguages];
 
     if (!loader) {
@@ -134,8 +136,9 @@ function useShikiHighlighter(): UseShikiHighlighterReturn {
     }
 
     const langEntry = LANGUAGES[languageKey];
-    const shikiId = langEntry?.shikiId ?? 'javascript';
+    const shikiId = langEntry?.shikiId ?? "javascript";
 
+    // If language isn't loaded yet, trigger async load and force re-render when done
     if (!loadedLanguages.has(shikiId)) {
       ensureLanguageLoaded(highlighter, shikiId).then(() => {
         setLangVersion((v) => v + 1);
@@ -146,7 +149,7 @@ function useShikiHighlighter(): UseShikiHighlighterReturn {
     try {
       return highlighter.codeToHtml(code, {
         lang: shikiId,
-        theme: 'vesper',
+        theme: "vesper",
       });
     } catch {
       return escapeHtml(code);
@@ -158,9 +161,9 @@ function useShikiHighlighter(): UseShikiHighlighterReturn {
 
 function escapeHtml(text: string): string {
   return `<pre style="background:transparent;margin:0;padding:0"><code>${text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')}</code></pre>`;
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")}</code></pre>`;
 }
 
 export { type UseShikiHighlighterReturn, useShikiHighlighter };

@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes } from 'react';
+import { forwardRef, type HTMLAttributes } from "react";
 
 export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -8,6 +8,6 @@ const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   },
 );
 
-CardContent.displayName = 'CardContent';
+CardContent.displayName = "CardContent";
 
 export { CardContent };

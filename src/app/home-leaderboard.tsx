@@ -1,23 +1,21 @@
-import { cacheLife } from 'next/cache';
-import Link from 'next/link';
-import type { BundledLanguage } from 'shiki';
-import { CodeBlock } from '@/components/ui/code-block';
-import { caller } from '@/trpc/server';
-import { LeaderboardEntryCode } from './leaderboard-entry-code';
+import { cacheLife } from "next/cache";
+import Link from "next/link";
+import type { BundledLanguage } from "shiki";
+import { CodeBlock } from "@/components/ui/code-block";
+import { caller } from "@/trpc/server";
+import { LeaderboardEntryCode } from "./leaderboard-entry-code";
 
 function scoreColor(score: number): string {
-  if (score <= 3) return 'text-accent-red';
-  if (score <= 6) return 'text-accent-amber';
-  return 'text-accent-green';
+  if (score <= 3) return "text-accent-red";
+  if (score <= 6) return "text-accent-amber";
+  return "text-accent-green";
 }
 
 async function HomeLeaderboard() {
-  'use cache';
-  cacheLife({ stale: 3600 });
+  "use cache";
+  cacheLife("hourly");
 
-  const { entries, totalCount } = await caller.roast.getLeaderboard({
-    limit: 3,
-  });
+  const { entries, totalCount } = await caller.roast.getLeaderboard({});
 
   return (
     <>
@@ -76,12 +74,12 @@ async function HomeLeaderboard() {
 
       {/* Fade Hint */}
       <p className="font-mono text-xs text-text-tertiary text-center">
-        showing top 3 of {totalCount.toLocaleString()} ·{' '}
+        showing top 3 of {totalCount.toLocaleString()} ·{" "}
         <Link
           href="/leaderboard"
           className="text-text-secondary hover:text-text-primary transition-colors"
         >
-          view full leaderboard {'>>'}
+          view full leaderboard {">>"}
         </Link>
       </p>
     </>

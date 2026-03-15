@@ -1,7 +1,5 @@
-CREATE TYPE "public"."severity" AS ENUM('critical', 'warning', 'good');
---> statement-breakpoint
-CREATE TYPE "public"."verdict" AS ENUM('needs_serious_help', 'rough_around_edges', 'decent_code', 'solid_work', 'exceptional');
---> statement-breakpoint
+CREATE TYPE "public"."severity" AS ENUM('critical', 'warning', 'good');--> statement-breakpoint
+CREATE TYPE "public"."verdict" AS ENUM('needs_serious_help', 'rough_around_edges', 'decent_code', 'solid_work', 'exceptional');--> statement-breakpoint
 CREATE TABLE "analysis_items" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"roast_id" uuid NOT NULL,
@@ -24,6 +22,5 @@ CREATE TABLE "roasts" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "analysis_items" ADD CONSTRAINT "analysis_items_roast_id_roasts_id_fk" FOREIGN KEY ("roast_id") REFERENCES "public"."roasts"("id") ON DELETE cascade ON UPDATE no action;
---> statement-breakpoint
+ALTER TABLE "analysis_items" ADD CONSTRAINT "analysis_items_roast_id_roasts_id_fk" FOREIGN KEY ("roast_id") REFERENCES "public"."roasts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "roasts_score_idx" ON "roasts" USING btree ("score");

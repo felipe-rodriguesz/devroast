@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { ChevronDown } from 'lucide-react';
-import { useCallback, useMemo, useRef } from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useShikiHighlighter } from '@/hooks/use-shiki-highlighter';
-import { LANGUAGE_OPTIONS, LANGUAGES } from '@/lib/languages';
+import { ChevronDown } from "lucide-react";
+import { useCallback, useMemo, useRef } from "react";
+import { twMerge } from "tailwind-merge";
+import { useShikiHighlighter } from "@/hooks/use-shiki-highlighter";
+import { LANGUAGE_OPTIONS, LANGUAGES } from "@/lib/languages";
 
 const MAX_CHARACTERS = 2000;
 
@@ -34,14 +34,14 @@ function CodeEditor({
   const charCount = value.length;
   const isOverLimit = charCount > MAX_CHARACTERS;
 
-  const lines = value.split('\n');
+  const lines = value.split("\n");
   const lineCount = Math.max(lines.length, 16);
 
   // Synchronous highlight — no debounce for instant feedback
   const highlightedHtml = useMemo(() => {
-    if (!isReady || !value) return '';
+    if (!isReady || !value) return "";
 
-    const lang = language ?? 'javascript';
+    const lang = language ?? "javascript";
     return highlight(value, lang);
   }, [value, language, isReady, highlight]);
 
@@ -69,7 +69,7 @@ function CodeEditor({
   return (
     <div
       className={twMerge(
-        'border border-border-primary overflow-hidden flex flex-col',
+        "border border-border-primary overflow-hidden flex flex-col",
         className,
       )}
     >
@@ -83,17 +83,17 @@ function CodeEditor({
         {/* Language selector */}
         <div className="relative flex items-center">
           <select
-            value={language ?? 'auto'}
+            value={language ?? "auto"}
             onChange={(e) => {
               const val = e.target.value;
-              onLanguageChange?.(val === 'auto' ? null : val);
+              onLanguageChange?.(val === "auto" ? null : val);
             }}
             className="bg-transparent font-mono text-xs text-text-secondary outline-none cursor-pointer appearance-none hover:text-text-primary transition-colors pr-5"
           >
             <option value="auto" className="bg-bg-surface text-text-primary">
               {displayLanguage
                 ? `${displayLanguage} (detected)`
-                : 'auto-detect'}
+                : "auto-detect"}
             </option>
             {LANGUAGE_OPTIONS.map((opt) => (
               <option
@@ -118,6 +118,7 @@ function CodeEditor({
         >
           {Array.from({ length: lineCount }, (_, i) => (
             <span
+              // biome-ignore lint/suspicious/noArrayIndexKey: line numbers are index-based and never reorder
               key={i}
               className="font-mono text-xs leading-[1.625] text-text-tertiary"
             >
@@ -134,6 +135,7 @@ function CodeEditor({
               ref={highlightedRef}
               aria-hidden="true"
               className="absolute inset-0 py-4 px-4 font-mono text-xs leading-[1.625] overflow-hidden whitespace-pre pointer-events-none [tab-size:2] [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent [&_.line]:leading-[1.625]"
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki generates trusted HTML from code strings
               dangerouslySetInnerHTML={{
                 __html: highlightedHtml,
               }}
@@ -152,10 +154,10 @@ function CodeEditor({
             autoComplete="off"
             autoCorrect="off"
             className={twMerge(
-              'relative z-10 w-full h-full py-4 px-4 bg-transparent font-mono text-xs leading-[1.625] outline-none resize-none min-h-80 whitespace-pre overflow-auto [tab-size:2]',
+              "relative z-10 w-full h-full py-4 px-4 bg-transparent font-mono text-xs leading-[1.625] outline-none resize-none min-h-80 whitespace-pre overflow-auto [tab-size:2]",
               hasHighlight
-                ? 'text-transparent caret-accent-green selection:bg-white/10'
-                : 'text-text-primary placeholder:text-text-tertiary caret-accent-green',
+                ? "text-transparent caret-accent-green selection:bg-white/10"
+                : "text-text-primary placeholder:text-text-tertiary caret-accent-green",
             )}
           />
         </div>
@@ -165,8 +167,8 @@ function CodeEditor({
       <div className="flex items-center justify-end h-8 px-4 border-t border-border-primary">
         <span
           className={twMerge(
-            'font-mono text-[10px] tabular-nums',
-            isOverLimit ? 'text-accent-red' : 'text-text-tertiary',
+            "font-mono text-[10px] tabular-nums",
+            isOverLimit ? "text-accent-red" : "text-text-tertiary",
           )}
         >
           {charCount.toLocaleString()}/{MAX_CHARACTERS.toLocaleString()}
@@ -176,4 +178,4 @@ function CodeEditor({
   );
 }
 
-export { CodeEditor, MAX_CHARACTERS, type CodeEditorProps };
+export { CodeEditor, type CodeEditorProps, MAX_CHARACTERS };

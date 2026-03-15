@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useShikiHighlighter } from '@/hooks/use-shiki-highlighter';
+import { useState } from "react";
+import { useShikiHighlighter } from "@/hooks/use-shiki-highlighter";
 
 const COLLAPSED_HEIGHT = 120;
 const COLLAPSIBLE_THRESHOLD = 5;
@@ -14,7 +14,7 @@ type CodePreviewProps = {
 function CodePreview({ code, language }: CodePreviewProps) {
   const { highlight, isReady } = useShikiHighlighter();
   const [open, setOpen] = useState(false);
-  const lines = code.split('\n');
+  const lines = code.split("\n");
   const lineCount = lines.length;
   const isCollapsible = lineCount > COLLAPSIBLE_THRESHOLD;
 
@@ -42,7 +42,7 @@ function CodePreview({ code, language }: CodePreviewProps) {
           style={
             isCollapsible && !open
               ? { maxHeight: COLLAPSED_HEIGHT }
-              : { maxHeight: 'none' }
+              : { maxHeight: "none" }
           }
         >
           <div className="p-3 font-mono text-[13px] leading-tight [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent [&_.line]:leading-[1.65]">
@@ -72,7 +72,7 @@ function CodePreview({ code, language }: CodePreviewProps) {
           onClick={() => setOpen((prev) => !prev)}
           className="flex items-center justify-center gap-1.5 w-full py-2 border-t border-border-primary font-mono text-xs text-text-secondary enabled:hover:bg-bg-elevated enabled:hover:text-text-primary transition-colors cursor-pointer"
         >
-          {open ? 'show less' : `show more (${lineCount} lines)`}
+          {open ? "show less" : `show more (${lineCount} lines)`}
         </button>
       )}
     </div>
@@ -81,9 +81,9 @@ function CodePreview({ code, language }: CodePreviewProps) {
 
 function escapeHtml(text: string): string {
   return `<pre style="background:transparent;margin:0;padding:0"><code>${text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')}</code></pre>`;
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")}</code></pre>`;
 }
 
 export { CodePreview };

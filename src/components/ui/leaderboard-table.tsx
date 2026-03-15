@@ -1,6 +1,6 @@
-import { forwardRef, type HTMLAttributes } from 'react';
+import { forwardRef, type HTMLAttributes } from "react";
 
-import { twMerge } from 'tailwind-merge';
+import { twMerge } from "tailwind-merge";
 
 const LeaderboardTableRoot = forwardRef<
   HTMLDivElement,
@@ -10,7 +10,7 @@ const LeaderboardTableRoot = forwardRef<
     <div
       ref={ref}
       className={twMerge(
-        'w-full overflow-hidden border border-neutral-800',
+        "w-full overflow-hidden border border-neutral-800",
         className,
       )}
       {...props}
@@ -19,7 +19,7 @@ const LeaderboardTableRoot = forwardRef<
     </div>
   );
 });
-LeaderboardTableRoot.displayName = 'LeaderboardTableRoot';
+LeaderboardTableRoot.displayName = "LeaderboardTableRoot";
 
 const LeaderboardTableHeader = forwardRef<
   HTMLDivElement,
@@ -29,7 +29,7 @@ const LeaderboardTableHeader = forwardRef<
     <div
       ref={ref}
       className={twMerge(
-        'flex h-10 w-full items-center border-b border-neutral-800 bg-neutral-800 px-5',
+        "flex h-10 w-full items-center border-b border-neutral-800 bg-neutral-800 px-5",
         className,
       )}
       {...props}
@@ -49,7 +49,7 @@ const LeaderboardTableHeader = forwardRef<
     </div>
   );
 });
-LeaderboardTableHeader.displayName = 'LeaderboardTableHeader';
+LeaderboardTableHeader.displayName = "LeaderboardTableHeader";
 
 const LeaderboardTableBody = forwardRef<
   HTMLDivElement,
@@ -58,14 +58,14 @@ const LeaderboardTableBody = forwardRef<
   return (
     <div
       ref={ref}
-      className={twMerge('flex w-full flex-col', className)}
+      className={twMerge("flex w-full flex-col", className)}
       {...props}
     >
       {children}
     </div>
   );
 });
-LeaderboardTableBody.displayName = 'LeaderboardTableBody';
+LeaderboardTableBody.displayName = "LeaderboardTableBody";
 
 const LeaderboardTableRow = forwardRef<
   HTMLDivElement,
@@ -75,7 +75,7 @@ const LeaderboardTableRow = forwardRef<
     <div
       ref={ref}
       className={twMerge(
-        'flex items-center border-b border-neutral-800 px-5 py-4 last:border-b-0',
+        "flex items-center border-b border-neutral-800 px-5 py-4 last:border-b-0",
         className,
       )}
       {...props}
@@ -84,7 +84,7 @@ const LeaderboardTableRow = forwardRef<
     </div>
   );
 });
-LeaderboardTableRow.displayName = 'LeaderboardTableRow';
+LeaderboardTableRow.displayName = "LeaderboardTableRow";
 
 interface LeaderboardTableCellProps extends HTMLAttributes<HTMLDivElement> {
   width?: string | number;
@@ -105,7 +105,7 @@ const LeaderboardTableCell = forwardRef<
     </div>
   );
 });
-LeaderboardTableCell.displayName = 'LeaderboardTableCell';
+LeaderboardTableCell.displayName = "LeaderboardTableCell";
 
 const LeaderboardTable = {
   Root: LeaderboardTableRoot,

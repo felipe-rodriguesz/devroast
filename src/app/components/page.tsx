@@ -2,24 +2,24 @@ import {
   AnalysisCardDescription,
   AnalysisCardRoot,
   AnalysisCardTitle,
-} from '@/components/ui/analysis-card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { CodeBlock, CodeBlockHeader } from '@/components/ui/code-block';
-import { DiffLine } from '@/components/ui/diff-line';
+} from "@/components/ui/analysis-card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CodeBlock, CodeBlockHeader } from "@/components/ui/code-block";
+import { DiffLine } from "@/components/ui/diff-line";
 import {
   LeaderboardRowCode,
   LeaderboardRowLanguage,
   LeaderboardRowRank,
   LeaderboardRowRoot,
   LeaderboardRowScore,
-} from '@/components/ui/leaderboard-row';
-import { ScoreRing } from '@/components/ui/score-ring';
-import { ToggleDemo } from './toggle-demo';
+} from "@/components/ui/leaderboard-row";
+import { ScoreRing } from "@/components/ui/score-ring";
+import { ToggleDemo } from "./toggle-demo";
 
-const buttonVariants = ['primary', 'secondary', 'ghost', 'danger'] as const;
-const buttonSizes = ['sm', 'md', 'lg'] as const;
-const badgeVariants = ['critical', 'warning', 'good'] as const;
+const buttonVariants = ["primary", "secondary", "ghost", "danger"] as const;
+const buttonSizes = ["sm", "md", "lg"] as const;
+const badgeVariants = ["critical", "warning", "good"] as const;
 
 const sampleCode = `function calculateTotal(items) {
   var total = 0;
@@ -33,7 +33,7 @@ export default function ComponentsPage() {
     <div className="min-h-screen bg-bg-page p-12 space-y-16">
       <header>
         <h1 className="font-mono text-accent-green text-lg mb-2">
-          {'// component_library'}
+          {"// component_library"}
         </h1>
         <p className="text-text-secondary text-sm">
           Biblioteca de componentes UI do DevRoast
@@ -147,7 +147,7 @@ export default function ComponentsPage() {
           <DiffLine type="removed">var total = 0;</DiffLine>
           <DiffLine type="added">const total = 0;</DiffLine>
           <DiffLine type="context">
-            {'for (let i = 0; i < items.length; i++) {'}
+            {"for (let i = 0; i < items.length; i++) {"}
           </DiffLine>
         </div>
       </Section>
@@ -159,7 +159,7 @@ export default function ComponentsPage() {
             <LeaderboardRowRank>#1</LeaderboardRowRank>
             <LeaderboardRowScore value={2.1} />
             <LeaderboardRowCode>
-              {'function calculateTotal(items) { var total = 0; ...'}
+              {"function calculateTotal(items) { var total = 0; ..."}
             </LeaderboardRowCode>
             <LeaderboardRowLanguage>javascript</LeaderboardRowLanguage>
           </LeaderboardRowRoot>
@@ -167,7 +167,7 @@ export default function ComponentsPage() {
             <LeaderboardRowRank>#2</LeaderboardRowRank>
             <LeaderboardRowScore value={5.4} />
             <LeaderboardRowCode>
-              {'const fetchData = async () => { try { ... } catch {} }'}
+              {"const fetchData = async () => { try { ... } catch {} }"}
             </LeaderboardRowCode>
             <LeaderboardRowLanguage>typescript</LeaderboardRowLanguage>
           </LeaderboardRowRoot>
@@ -175,7 +175,7 @@ export default function ComponentsPage() {
             <LeaderboardRowRank>#3</LeaderboardRowRank>
             <LeaderboardRowScore value={8.7} />
             <LeaderboardRowCode>
-              {'def merge_sort(arr): if len(arr) <= 1: return arr'}
+              {"def merge_sort(arr): if len(arr) <= 1: return arr"}
             </LeaderboardRowCode>
             <LeaderboardRowLanguage>python</LeaderboardRowLanguage>
           </LeaderboardRowRoot>

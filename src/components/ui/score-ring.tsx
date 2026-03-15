@@ -1,13 +1,13 @@
-import type { ComponentProps } from 'react';
-import { twMerge } from 'tailwind-merge';
+import type { ComponentProps } from "react";
+import { twMerge } from "tailwind-merge";
 
-type ScoreRingProps = ComponentProps<'div'> & {
+type ScoreRingProps = ComponentProps<"div"> & {
   score: number;
   total?: number;
 };
 
 function scoreGradientId(score: number) {
-  return `score-gradient-${score.toString().replace('.', '-')}`;
+  return `score-gradient-${score.toString().replace(".", "-")}`;
 }
 
 const SIZE = 180;
@@ -24,7 +24,7 @@ function ScoreRing({ score, total = 10, className, ...props }: ScoreRingProps) {
   return (
     <div
       className={twMerge(
-        'relative inline-flex items-center justify-center',
+        "relative inline-flex items-center justify-center",
         className,
       )}
       style={{ width: SIZE, height: SIZE }}

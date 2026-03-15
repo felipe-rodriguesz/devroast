@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { Switch } from '@base-ui/react/switch';
-import type { ComponentProps } from 'react';
-import { twMerge } from 'tailwind-merge';
+import { Switch } from "@base-ui/react/switch";
+import type { ComponentProps } from "react";
+import { twMerge } from "tailwind-merge";
 
 type ToggleProps = Pick<
-  ComponentProps<'button'>,
-  'id' | 'disabled' | 'aria-label' | 'aria-labelledby'
+  ComponentProps<"button">,
+  "id" | "disabled" | "aria-label" | "aria-labelledby"
 > & {
   checked?: boolean;
   defaultChecked?: boolean;
@@ -24,7 +24,7 @@ function Toggle({
   ...props
 }: ToggleProps) {
   return (
-    <span className={twMerge('inline-flex items-center gap-3', className)}>
+    <span className={twMerge("inline-flex items-center gap-3", className)}>
       <Switch.Root
         checked={checked}
         defaultChecked={defaultChecked}

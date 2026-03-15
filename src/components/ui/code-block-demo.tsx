@@ -1,4 +1,4 @@
-import { CodeBlock } from '@/components/ui/code-block.server';
+import { CodeBlock } from "@/components/ui/code-block.server";
 
 export function CodeBlockDemo() {
   return (

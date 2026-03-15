@@ -1,24 +1,24 @@
-import type { Metadata } from 'next';
-import { cacheLife } from 'next/cache';
-import type { BundledLanguage } from 'shiki';
-import { CodeBlock } from '@/components/ui/code-block';
-import { caller } from '@/trpc/server';
-import { LeaderboardEntryCode } from '../leaderboard-entry-code';
+import type { Metadata } from "next";
+import { cacheLife } from "next/cache";
+import type { BundledLanguage } from "shiki";
+import { CodeBlock } from "@/components/ui/code-block";
+import { caller } from "@/trpc/server";
+import { LeaderboardEntryCode } from "../leaderboard-entry-code";
 
 export const metadata: Metadata = {
-  title: 'Shame Leaderboard — DevRoast',
+  title: "Shame Leaderboard — DevRoast",
   description:
-    'The most roasted code on the internet. See the worst-scored submissions ranked by shame.',
+    "The most roasted code on the internet. See the worst-scored submissions ranked by shame.",
 };
 
 function scoreColor(score: number): string {
-  if (score <= 3) return 'text-accent-red';
-  if (score <= 6) return 'text-accent-amber';
-  return 'text-accent-green';
+  if (score <= 3) return "text-accent-red";
+  if (score <= 6) return "text-accent-amber";
+  return "text-accent-green";
 }
 
 export default async function LeaderboardPage() {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 3600 });
 
   const [{ totalRoasts, avgScore }, { entries }] = await Promise.all([
@@ -33,7 +33,7 @@ export default async function LeaderboardPage() {
         <section className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <span className="font-mono text-[32px] font-bold text-accent-green">
-              {'>'}
+              {">"}
             </span>
             <h1 className="font-mono text-[28px] font-bold text-text-primary">
               shame_leaderboard
@@ -41,14 +41,14 @@ export default async function LeaderboardPage() {
           </div>
 
           <p className="font-mono text-sm text-text-secondary">
-            {'// the most roasted code on the internet'}
+            {"// the most roasted code on the internet"}
           </p>
 
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs text-text-tertiary">
               {totalRoasts.toLocaleString()} submissions
             </span>
-            <span className="font-mono text-xs text-text-tertiary">{'·'}</span>
+            <span className="font-mono text-xs text-text-tertiary">{"·"}</span>
             <span className="font-mono text-xs text-text-tertiary">
               avg score: {avgScore.toFixed(1)}/10
             </span>
