@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes } from 'react';
+import { forwardRef, type HTMLAttributes } from "react";
 
 export interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {}
 
@@ -10,6 +10,6 @@ const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
   },
 );
 
-CardTitle.displayName = 'CardTitle';
+CardTitle.displayName = "CardTitle";
 
 export { CardTitle };

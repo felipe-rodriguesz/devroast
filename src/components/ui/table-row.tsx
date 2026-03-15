@@ -1,11 +1,11 @@
-import { forwardRef, type HTMLAttributes } from 'react';
+import { forwardRef, type HTMLAttributes } from "react";
 
-import { twMerge } from 'tailwind-merge';
+import { twMerge } from "tailwind-merge";
 
 export interface TableRowProps extends HTMLAttributes<HTMLDivElement> {
   rank: string;
   score: string;
-  scoreVariant?: 'default' | 'critical' | 'warning' | 'good';
+  scoreVariant?: "default" | "critical" | "warning" | "good";
   code: string;
   language: string;
 }
@@ -16,7 +16,7 @@ const TableRow = forwardRef<HTMLDivElement, TableRowProps>(
       className,
       rank,
       score,
-      scoreVariant = 'default',
+      scoreVariant = "default",
       code,
       language,
       ...props
@@ -24,17 +24,17 @@ const TableRow = forwardRef<HTMLDivElement, TableRowProps>(
     ref,
   ) => {
     const scoreColorClass = {
-      default: 'text-neutral-50',
-      critical: 'text-accent-red',
-      warning: 'text-accent-amber',
-      good: 'text-accent-green',
+      default: "text-neutral-50",
+      critical: "text-accent-red",
+      warning: "text-accent-amber",
+      good: "text-accent-green",
     }[scoreVariant];
 
     return (
       <div
         ref={ref}
         className={twMerge(
-          'flex items-center gap-6 border-b border-neutral-800 px-5 py-4',
+          "flex items-center gap-6 border-b border-neutral-800 px-5 py-4",
           className,
         )}
         {...props}
@@ -56,6 +56,6 @@ const TableRow = forwardRef<HTMLDivElement, TableRowProps>(
   },
 );
 
-TableRow.displayName = 'TableRow';
+TableRow.displayName = "TableRow";
 
 export { TableRow };

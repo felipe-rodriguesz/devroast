@@ -1,4 +1,4 @@
-import { codeToHtml } from 'shiki';
+import { codeToHtml } from "shiki";
 
 export interface CodeBlockProps {
   code: string;
@@ -9,7 +9,7 @@ export interface CodeBlockProps {
 export async function CodeBlock({ code, language, filename }: CodeBlockProps) {
   const html = await codeToHtml(code, {
     lang: language,
-    theme: 'vesper',
+    theme: "vesper",
   });
 
   return (

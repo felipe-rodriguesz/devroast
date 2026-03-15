@@ -1,6 +1,6 @@
-import type { BundledLanguage } from 'shiki';
-import { codeToHtml } from 'shiki';
-import { twMerge } from 'tailwind-merge';
+import type { BundledLanguage } from "shiki";
+import { codeToHtml } from "shiki";
+import { twMerge } from "tailwind-merge";
 
 type CodeBlockProps = {
   code: string;
@@ -9,19 +9,19 @@ type CodeBlockProps = {
 };
 
 async function CodeBlock({ code, lang, className }: CodeBlockProps) {
-  'use cache';
+  "use cache";
 
   const html = await codeToHtml(code, {
     lang,
-    theme: 'vesper',
+    theme: "vesper",
   });
 
-  const lines = code.split('\n');
+  const lines = code.split("\n");
 
   return (
     <div
       className={twMerge(
-        'border border-border-primary overflow-hidden',
+        "border border-border-primary overflow-hidden",
         className,
       )}
     >
@@ -69,6 +69,6 @@ function CodeBlockHeader({ filename }: CodeBlockHeaderProps) {
 export {
   CodeBlock,
   CodeBlockHeader,
-  type CodeBlockProps,
   type CodeBlockHeaderProps,
+  type CodeBlockProps,
 };

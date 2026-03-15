@@ -6,7 +6,7 @@ export default function LeaderboardLoading() {
         <section className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <span className="font-mono text-[32px] font-bold text-accent-green">
-              {'>'}
+              {">"}
             </span>
             <h1 className="font-mono text-[28px] font-bold text-text-primary">
               shame_leaderboard
@@ -14,12 +14,12 @@ export default function LeaderboardLoading() {
           </div>
 
           <p className="font-mono text-sm text-text-secondary">
-            {'// the most roasted code on the internet'}
+            {"// the most roasted code on the internet"}
           </p>
 
           <div className="flex items-center gap-2">
             <span className="inline-block w-28 h-3 bg-bg-elevated animate-pulse rounded-sm" />
-            <span className="font-mono text-xs text-text-tertiary">{'·'}</span>
+            <span className="font-mono text-xs text-text-tertiary">{"·"}</span>
             <span className="inline-block w-24 h-3 bg-bg-elevated animate-pulse rounded-sm" />
           </div>
         </section>

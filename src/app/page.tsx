@@ -1,14 +1,14 @@
-import { cacheLife } from 'next/cache';
-import Link from 'next/link';
-import { Suspense } from 'react';
-import { HydrateClient, prefetch, trpc } from '@/trpc/server';
-import { HomeEditor } from './home-editor';
-import { HomeLeaderboard } from './home-leaderboard';
-import { HomeLeaderboardSkeleton } from './home-leaderboard-skeleton';
-import { HomeStats } from './home-stats';
+import { cacheLife } from "next/cache";
+import Link from "next/link";
+import { Suspense } from "react";
+import { HydrateClient, prefetch, trpc } from "@/trpc/server";
+import { HomeEditor } from "./home-editor";
+import { HomeLeaderboard } from "./home-leaderboard";
+import { HomeLeaderboardSkeleton } from "./home-leaderboard-skeleton";
+import { HomeStats } from "./home-stats";
 
 export default async function HomePage() {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 3600 });
 
   prefetch(trpc.roast.getStats.queryOptions());
@@ -51,7 +51,7 @@ export default async function HomePage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="font-mono text-sm font-bold text-accent-green">
-              {'//'}
+              {"//"}
             </span>
             <span className="font-mono text-sm font-bold text-text-primary">
               shame_leaderboard
@@ -62,13 +62,13 @@ export default async function HomePage() {
             href="/leaderboard"
             className="font-mono text-xs text-text-secondary border border-border-primary px-3 py-1.5 hover:bg-bg-elevated transition-colors"
           >
-            $ view_all {'>>'}
+            $ view_all {">>"}
           </Link>
         </div>
 
         {/* Subtitle */}
         <p className="font-mono text-[13px] text-text-tertiary -mt-2">
-          {'// the worst code on the internet, ranked by shame'}
+          {"// the worst code on the internet, ranked by shame"}
         </p>
 
         {/* Leaderboard Table + Footer (async, with skeleton fallback) */}
