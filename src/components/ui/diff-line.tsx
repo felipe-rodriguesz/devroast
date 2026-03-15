@@ -1,52 +1,67 @@
-import { forwardRef, type HTMLAttributes } from 'react';
-
-import { twMerge } from 'tailwind-merge';
+import type { ComponentProps } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 
-const diffLineVariants = tv(
-  {
-    base: 'flex items-center gap-3 font-mono text-sm',
-    variants: {
-      variant: {
-        removed: 'bg-red-950 text-orange-500',
-        added: 'bg-green-950 text-green-500',
-        context: 'text-neutral-400',
-      },
-    },
-    defaultVariants: {
-      variant: 'context',
+const diffLine = tv({
+  base: 'flex gap-2 px-4 py-2 font-mono text-[13px] w-full',
+  variants: {
+    type: {
+      added: 'bg-diff-added',
+      removed: 'bg-diff-removed',
+      context: 'bg-transparent',
     },
   },
-  {
-    twMerge: false,
+  defaultVariants: {
+    type: 'context',
   },
-);
+});
 
-export interface DiffLineProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof diffLineVariants> {
-  lineNumber?: number;
+const diffPrefix = tv({
+  base: 'select-none shrink-0',
+  variants: {
+    type: {
+      added: 'text-accent-green',
+      removed: 'text-accent-red',
+      context: 'text-text-tertiary',
+    },
+  },
+  defaultVariants: {
+    type: 'context',
+  },
+});
+
+const diffContent = tv({
+  base: '',
+  variants: {
+    type: {
+      added: 'text-text-primary',
+      removed: 'text-text-secondary',
+      context: 'text-text-secondary',
+    },
+  },
+  defaultVariants: {
+    type: 'context',
+  },
+});
+
+type DiffLineVariants = VariantProps<typeof diffLine>;
+
+type DiffLineProps = Omit<ComponentProps<'div'>, 'type'> & DiffLineVariants;
+
+const prefixMap = {
+  added: '+',
+  removed: '-',
+  context: ' ',
+} as const;
+
+function DiffLine({ type, className, children, ...props }: DiffLineProps) {
+  return (
+    <div className={diffLine({ type, className })} {...props}>
+      <span className={diffPrefix({ type })}>
+        {prefixMap[type ?? 'context']}
+      </span>
+      <span className={diffContent({ type })}>{children}</span>
+    </div>
+  );
 }
 
-const DiffLine = forwardRef<HTMLDivElement, DiffLineProps>(
-  ({ className, variant, lineNumber, children, ...props }, ref) => {
-    return (
-      <div
-        className={twMerge(diffLineVariants({ variant, className }))}
-        ref={ref}
-        {...props}
-      >
-        {lineNumber !== undefined && (
-          <span className="w-8 text-right text-neutral-500 select-none">
-            {lineNumber}
-          </span>
-        )}
-        <span className="flex-1">{children}</span>
-      </div>
-    );
-  },
-);
-
-DiffLine.displayName = 'DiffLine';
-
-export { DiffLine, diffLineVariants };
+export { DiffLine, type DiffLineProps, type DiffLineVariants, diffLine };

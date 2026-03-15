@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import { JetBrains_Mono } from 'next/font/google';
-import { twMerge } from 'tailwind-merge';
-import { Navbar } from '@/components/ui/navbar';
+import { Navbar } from './components/navbar';
 import './globals.css';
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: '--font-mono',
+  variable: '--font-jetbrains-mono',
   subsets: ['latin'],
 });
 
@@ -21,12 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={twMerge(
-          jetbrainsMono.variable,
-          'antialiased bg-neutral-950',
-        )}
-      >
+      <body className={`${jetbrainsMono.variable} antialiased bg-bg-page`}>
         <Navbar />
         {children}
       </body>

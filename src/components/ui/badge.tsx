@@ -1,44 +1,45 @@
-import { forwardRef, type HTMLAttributes } from 'react';
-
-import { twMerge } from 'tailwind-merge';
+import type { ComponentProps } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 
-const badgeVariants = tv(
-  {
-    base: 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-xs font-medium font-mono transition-colors',
-    variants: {
-      variant: {
-        critical: 'bg-red-950 text-orange-500 border border-red-900',
-        warning: 'bg-amber-950 text-amber-500 border border-amber-900',
-        good: 'bg-green-950 text-green-500 border border-green-900',
-        verdict: 'bg-orange-950 text-orange-500 border border-orange-900',
-      },
-    },
-    defaultVariants: {
-      variant: 'good',
+const badge = tv({
+  base: 'inline-flex items-center gap-2 font-mono text-xs',
+  variants: {
+    variant: {
+      critical: 'text-accent-red',
+      warning: 'text-accent-amber',
+      good: 'text-accent-green',
     },
   },
-  {
-    twMerge: false,
+  defaultVariants: {
+    variant: 'critical',
   },
-);
+});
 
-export interface BadgeProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
-
-const Badge = forwardRef<HTMLDivElement, BadgeProps>(
-  ({ className, variant, ...props }, ref) => {
-    return (
-      <div
-        className={twMerge(badgeVariants({ variant, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
+const badgeDot = tv({
+  base: 'size-2 rounded-full',
+  variants: {
+    variant: {
+      critical: 'bg-accent-red',
+      warning: 'bg-accent-amber',
+      good: 'bg-accent-green',
+    },
   },
-);
+  defaultVariants: {
+    variant: 'critical',
+  },
+});
 
-Badge.displayName = 'Badge';
+type BadgeVariants = VariantProps<typeof badge>;
 
-export { Badge, badgeVariants };
+type BadgeProps = ComponentProps<'span'> & BadgeVariants;
+
+function Badge({ variant, className, children, ...props }: BadgeProps) {
+  return (
+    <span className={badge({ variant, className })} {...props}>
+      <span className={badgeDot({ variant })} />
+      {children}
+    </span>
+  );
+}
+
+export { Badge, type BadgeProps, type BadgeVariants, badge };

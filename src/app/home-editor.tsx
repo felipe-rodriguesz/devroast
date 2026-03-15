@@ -2,19 +2,22 @@
 
 import { useState } from 'react';
 
-import { CodeEditor } from '@/components/code-editor';
+import { CodeEditor, type LanguageId } from '@/components/code-editor';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
 
 function HomeEditor() {
   const [code, setCode] = useState('');
   const [roastMode, setRoastMode] = useState(true);
+  const [language, setLanguage] = useState<LanguageId>('auto');
 
   return (
     <div className="flex flex-col items-center gap-8 w-full">
       <CodeEditor
         value={code}
         onChange={setCode}
+        language={language}
+        onLanguageChange={setLanguage}
         className="w-full max-w-3xl"
       />
 
