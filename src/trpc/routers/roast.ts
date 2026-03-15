@@ -3,8 +3,21 @@ import { generateText, Output } from "ai";
 import { asc, avg, count, eq } from "drizzle-orm";
 import { z } from "zod";
 import { analysisItems, roasts } from "@/db/schema";
-import { getSystemPrompt, model, roastOutputSchema } from "@/lib/ai";
+import {
+  getSystemPrompt,
+  model,
+  roastOutputSchema,
+  useStructuredOutput,
+} from "@/lib/ai";
 import { baseProcedure, createTRPCRouter } from "../init";
+
+function parseJsonResponse(text: string) {
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error("No JSON found in response");
+  }
+  return JSON.parse(jsonMatch[0]);
+}
 
 export const roastRouter = createTRPCRouter({
   getStats: baseProcedure.query(async ({ ctx }) => {
@@ -57,12 +70,26 @@ export const roastRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { output } = await generateText({
-        model,
-        output: Output.object({ schema: roastOutputSchema }),
-        system: getSystemPrompt(input.roastMode),
-        prompt: `Language: ${input.language}\n\nCode:\n${input.code}`,
-      });
+      let output;
+
+      if (useStructuredOutput) {
+        const result = await generateText({
+          model,
+          output: Output.object({ schema: roastOutputSchema }),
+          system: getSystemPrompt(input.roastMode),
+          prompt: `Language: ${input.language}\n\nCode:\n${input.code}`,
+        });
+        output = result.output;
+      } else {
+        const result = await generateText({
+          model,
+          system: getSystemPrompt(input.roastMode),
+          prompt: `Language: ${input.language}\n\nCode:\n${input.code}\n\nRespond ONLY with valid JSON in this exact format:
+{"score": 0.0, "verdict": "needs_serious_help", "roastQuote": "...", "analysisItems": [{"severity": "critical", "title": "...", "description": "..."}], "suggestedFix": "..."}`,
+        });
+        output = parseJsonResponse(result.text);
+        output = roastOutputSchema.parse(output);
+      }
 
       if (!output) {
         throw new TRPCError({
