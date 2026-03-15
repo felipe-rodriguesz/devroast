@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { JetBrains_Mono } from 'next/font/google';
+import { TRPCReactProvider } from '@/trpc/client';
 import { Navbar } from './components/navbar';
 import './globals.css';
 
@@ -19,10 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${jetbrainsMono.variable} antialiased bg-bg-page`}>
-        <Navbar />
-        {children}
+    <html lang="en" className={jetbrainsMono.variable}>
+      <body className="font-sans antialiased">
+        <TRPCReactProvider>
+          <Navbar />
+          {children}
+        </TRPCReactProvider>
       </body>
     </html>
   );
