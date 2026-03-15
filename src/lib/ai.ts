@@ -1,21 +1,32 @@
-import { openai } from "@ai-sdk/openai";
-import { z } from "zod";
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createGroq } from '@ai-sdk/groq';
+import { z } from 'zod';
 
-export const model = openai("gpt-4o-mini");
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+});
+
+const groq = createGroq({
+  apiKey: process.env.GROQ_API_KEY,
+});
+
+export const model = groq('llama-3.3-70b-versatile');
+
+export const useStructuredOutput = false;
 
 export const roastOutputSchema = z.object({
   score: z.number().min(0).max(10),
   verdict: z.enum([
-    "needs_serious_help",
-    "rough_around_edges",
-    "decent_code",
-    "solid_work",
-    "exceptional",
+    'needs_serious_help',
+    'rough_around_edges',
+    'decent_code',
+    'solid_work',
+    'exceptional',
   ]),
   roastQuote: z.string(),
   analysisItems: z.array(
     z.object({
-      severity: z.enum(["critical", "warning", "good"]),
+      severity: z.enum(['critical', 'warning', 'good']),
       title: z.string(),
       description: z.string(),
     }),
