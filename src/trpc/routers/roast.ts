@@ -7,6 +7,7 @@ import {
   getSystemPrompt,
   model,
   roastOutputSchema,
+  type RoastOutput,
   useStructuredOutput,
 } from '@/lib/ai';
 import { baseProcedure, createTRPCRouter } from '../init';
@@ -70,7 +71,7 @@ export const roastRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      let output;
+      let output: RoastOutput | undefined;
 
       if (useStructuredOutput) {
         const result = await generateText({
