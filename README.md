@@ -2,6 +2,16 @@
 
 Aplicação web para enviar trechos de código, receber uma análise gerada por IA e consultar os envios com menor pontuação em um leaderboard. O projeto foi desenvolvido durante a NLW da [Rocketseat](https://rocketseat.com.br) e reúne uma interface interativa, renderização no servidor, uma API tipada e persistência em PostgreSQL.
 
+## Interface
+
+Editor de código e prévia do ranking, com dados fictícios carregados em um banco local:
+
+![Página inicial do DevRoast com editor de código e prévia do ranking](docs/screenshots/home.png)
+
+Ranking completo com os dados de demonstração:
+
+![Ranking do DevRoast](docs/screenshots/leaderboard.png)
+
 ## Funcionalidades
 
 - Editor de código com detecção automática de linguagem e seleção manual.
